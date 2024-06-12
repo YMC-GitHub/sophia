@@ -26,10 +26,7 @@
     "lint": "eslint . -c ./.eslintrc.yml",
     "bench": "node -r @swc-node/register benchmark/bench.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ymc-github/sophia.git"
-  },
+  "repository": "https://github.com/ymc-github/sophia",
   "bugs": {
     "url": "https://github.com/ymc-github/sophia/issues"
   },
