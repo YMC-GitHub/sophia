@@ -332,6 +332,7 @@ gh release delete v$ver --repo $repo --yes;
 ## commit -x
 
 ```powershell
+git add . ; git commit -m "build(core): init";
 git add . ; git commit -m "build(core): add license file";
 git add . ; git commit -m "build(core): dispatch manually";
 git add . ; git commit -m "build(core): debug workflow";
