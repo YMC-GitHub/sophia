@@ -117,8 +117,5 @@
     "*.toml": [
       "taplo format"
     ]
-  },
-  "optionalDependencies": {
-    "@yors/sophia-win32-x64-msvc": "0.1.0"
   }
 }
