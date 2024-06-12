@@ -26,7 +26,10 @@
     "lint": "eslint . -c ./.eslintrc.yml",
     "bench": "node -r @swc-node/register benchmark/bench.ts"
   },
-  "repository": "https://github.com/ymc-github/sophia",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ymc-github/sophia.git"
+  },
   "bugs": {
     "url": "https://github.com/ymc-github/sophia/issues"
   },
@@ -114,5 +117,8 @@
     "*.toml": [
       "taplo format"
     ]
+  },
+  "optionalDependencies": {
+    "@yors/sophia-win32-x64-msvc": "0.1.0"
   }
 }
