@@ -3,6 +3,16 @@ use crate::utils::handle_result;
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
+// code(core): use ./geometry.rs 's struct Point
+// code(core): use ./utils.rs 's fn handle_result
+// code(core): use napi::bindgen_prelude 's all api
+// code(core): use napi_derive 's fn napi
+
+// code(core): def struct ImageData
+// code(core): use napi(object) macro to label struct ImageData
+// code(core): use derive(Debug, Clone) macro to label struct ImageData
+// code(core): with data,width,height,pixel_width prop
+
 #[napi]
 #[derive(Debug, Clone)]
 pub struct ImageData {
@@ -12,6 +22,11 @@ pub struct ImageData {
   pub pixel_width: u8,
 }
 
+// code(core): def struct Color
+// code(core): use napi(object) macro to label struct Color
+// code(core): use derive(Debug, Clone) macro to label struct Color
+// code(core): with r,g,b prop
+
 #[napi(object)]
 #[derive(Debug, Clone)]
 pub struct Color {
@@ -20,6 +35,10 @@ pub struct Color {
   pub b: u8,
 }
 
+// code(core): def const MAGENTA
+// code(core): with r,g,b prop and value (255,0,255)
+// code(core): use napi macro to label const MAGENTA
+
 #[napi]
 pub const MAGENTA: Color = Color {
   r: 255,
@@ -27,6 +46,13 @@ pub const MAGENTA: Color = Color {
   b: 255,
 };
 
+// code(core): def fn read_image_data
+// code(core): use napi macro to label it
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
+// code(core): use fn image::open to open image from path
+// code(core): get image with,height,pixel_width,bytes data
+// code(core): use struct sophia::ImageData to compose image-data
 #[napi]
 pub async fn read_image_data(path: String) -> Result<ImageData> {
   let task = tokio::spawn(async move {
@@ -51,6 +77,17 @@ pub async fn read_image_data(path: String) -> Result<ImageData> {
   handle_result(task).await
 }
 
+// code(core): def fn save_image_data
+// code(core): use napi macro to label it
+// code(core): copy the value of path and image-data
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
+
+// code(core): get image with,height,pixel_width,bytes data
+// code(core): use struct sophia::ImageData to compose image-data
+// code(core): use fn image::RgbaImage::from_raw to transform image-data to buffer
+// code(core): use fn image::DynamicImage::save to save image buffer to path
+
 #[napi]
 pub async fn save_image_data(path: String, image_data: &ImageData) -> Result<()> {
   let path = path.clone();
@@ -71,6 +108,13 @@ pub async fn save_image_data(path: String, image_data: &ImageData) -> Result<()>
 
   handle_result(task).await
 }
+
+// code(core): def fn image_search
+// code(core): use napi macro to label it
+// code(core): copy the value of source and target
+
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
 
 #[napi]
 pub async fn image_search(
@@ -94,6 +138,12 @@ pub async fn image_search(
   handle_result(task).await
 }
 
+// code(core): def fn multiple_image_search
+// code(core): use napi macro to label it
+// code(core): copy the value of source and target
+
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
 #[napi]
 pub async fn multiple_image_search(
   source: &ImageData,
