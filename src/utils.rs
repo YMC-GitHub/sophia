@@ -59,6 +59,12 @@ pub fn decode_wide(chars: &[u16]) -> String {
     .to_string()
 }
 
+// code(core): def pub fn to handle result of async task from tokio
+// code(core): use struct tokio::task::JoinHandle
+// code(core): when match task.await handle result
+// code(core): when match Ok result get value if Operation ok
+// code(core): def err when operation fail with status and reason
+// code(core): def err when task join fail with status and reason
 pub async fn handle_result<T>(
   task: tokio::task::JoinHandle<std::result::Result<T, String>>,
 ) -> Result<T> {
