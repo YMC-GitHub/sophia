@@ -1,6 +1,11 @@
 use napi::bindgen_prelude::BigInt;
 use napi::{Error, Result, Status};
 
+// code(core): use napi's struct BigInt of bindgen_prelude mod
+// code(core): use napi's struct Error,Result,Status
+// code(core): def pub fn to transform bigint to i8,u8,i16,u16,i32,u32,i64,u64
+// code(core): def pub fn to transform bigint to usize
+
 pub fn bigint_to_i8(bigint: BigInt) -> i8 {
   bigint_to_i64(bigint) as i8
 }
@@ -39,12 +44,15 @@ pub fn bigint_to_usize(bigint: BigInt) -> usize {
   bigint_to_u64(bigint) as usize
 }
 
+// code(core): def pub fn to transform string to vec<u16>
+// code(core): use std::os::windows::prelude::OsStrExt::encode_wide
 pub fn encode_wide<S: AsRef<std::ffi::OsStr>>(string: S) -> Vec<u16> {
   std::os::windows::prelude::OsStrExt::encode_wide(string.as_ref())
     .chain(std::iter::once(0))
     .collect()
 }
 
+// code(core): def pub fn to transform vec<u16> to string
 pub fn decode_wide(chars: &[u16]) -> String {
   String::from_utf16_lossy(chars)
     .trim_end_matches('\0')
