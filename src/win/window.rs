@@ -10,22 +10,46 @@ use windows::Win32::UI::WindowsAndMessaging::{
   SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE, SW_SHOWNORMAL,
 };
 
+// code(core): def struct Window
+// code(core): use napi macro to label it
+// code(core): with hwnd prop
+// code(core): use struct windows::Win32::Foundation::HWND
+
 #[napi]
 pub struct Window {
   hwnd: HWND,
 }
 
+// code(core): impl Window
+// code(core): use napi macro to label it
+
 #[napi]
 impl Window {
+  // code(core): impl struct Window with a method minimize
+  // code(core): use napi macro to label it
+  // code(core): use inner fn self.show_window
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE
   #[napi]
   pub async fn minimize(&self) -> Result<()> {
     self.show_window(SW_MINIMIZE).await
   }
 
+  // code(core): impl struct Window with a method maximize
+  // code(core): use napi macro to label it
+  // code(core): use inner fn self.show_window
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE
   #[napi]
   pub async fn maximize(&self) -> Result<()> {
     self.show_window(SW_MAXIMIZE).await
   }
+
+  // code(core): impl struct Window with a method get_title
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn utils::handle_result to handle task
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetWindowTextW
+  // code(core): use fn sophia::utils::decode_wide
 
   #[napi]
   pub async fn get_title(&self) -> Result<String> {
@@ -42,6 +66,14 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // code(core): impl struct Window with a method get_window_rect
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use fn windows::Win32::Foundation::RECT::default
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetWindowRect
+  // code(core): use struct sophia::geometry::Rect
 
   #[napi]
   pub async fn get_window_rect(&self) -> Result<Rect> {
@@ -64,7 +96,11 @@ impl Window {
 
     handle_result(task).await
   }
-
+  // code(core): impl struct Window with a method inner fn show_window
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindow
   async fn show_window(&self, state: SHOW_WINDOW_CMD) -> Result<()> {
     let hwnd = self.hwnd;
 
@@ -79,16 +115,33 @@ impl Window {
     handle_result(task).await
   }
 
+  // code(core): impl struct Window with a method set_position
+  // code(core): use napi macro to label it
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SWP_NOSIZE
+  // code(core): use inner fn self.set_window_pos
+
   #[napi]
   pub async fn set_position(&self, x: i32, y: i32) -> Result<()> {
     self.set_window_pos(x, y, 0, 0, SWP_NOSIZE).await
   }
+
+  // code(core): impl struct Window with a method set_size
+  // code(core): use napi macro to label it
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE
+  // code(core): use inner fn self.set_window_pos
 
   #[napi]
   pub async fn set_size(&self, width: i32, height: i32) -> Result<()> {
     self.set_window_pos(0, 0, width, height, SWP_NOMOVE).await
   }
 
+  // code(core): impl struct Window with a method foreground
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow
   #[napi]
   pub async fn foreground(&self) -> Result<bool> {
     let hwnd = self.hwnd;
@@ -105,7 +158,11 @@ impl Window {
 
     handle_result(task).await
   }
-
+  // code(core): impl struct Window with a method inner fn set_window_pos
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SET_WINDOW_POS_FLAGS
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetWindowPos
   async fn set_window_pos(
     &self,
     x: i32,
@@ -126,7 +183,11 @@ impl Window {
 
     handle_result(task).await
   }
-
+  // code(core): impl struct Window with a method get_foreground_window
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow
   #[napi]
   pub async fn get_foreground_window() -> Result<Option<Window>> {
     let task = tokio::spawn(async move {
@@ -142,6 +203,14 @@ impl Window {
     handle_result(task).await
   }
 
+  // code(core): impl struct Window with a method find_window_by_title
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use fn sophia::utils::encode_wide to transform str to buf
+  // code(core): use struct windows_core::strings::pcwstr::PCWSTR
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::FindWindowW
+
   #[napi]
   pub async fn find_window_by_title(title: String) -> Result<Option<Window>> {
     let task = tokio::spawn(async move {
@@ -156,6 +225,14 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // code(core): impl struct Window with a method find_window_by_class_name
+  // code(core): use napi macro to label it
+  // code(core): use fn tokio::spawn to make async task
+  // code(core): use fn sophia::utils::handle_result to handle task
+  // code(core): use fn sophia::utils::encode_wide to transform str to buf
+  // code(core): use struct windows_core::strings::pcwstr::PCWSTR
+  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::FindWindowW
 
   #[napi]
   pub async fn find_window_by_class_name(classname: String) -> Result<Option<Window>> {

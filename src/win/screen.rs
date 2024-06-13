@@ -11,6 +11,13 @@ use windows::Win32::UI::WindowsAndMessaging::{
   GetDesktopWindow, GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN,
 };
 
+// code(core): def inner fn create_bitmap_info
+// code(core): use struct windows::Win32::Graphics::Gdi::BITMAPINFO as return type
+
+// code(core): use fn std::mem::zeroed
+// code(core): use struct windows::Win32::Graphics::Gdi::BITMAPINFOHEADER
+// code(core): use fn std::mem::size_of
+
 fn create_bitmap_info(width: i32, height: i32) -> BITMAPINFO {
   unsafe {
     let mut bmi = std::mem::zeroed::<BITMAPINFOHEADER>();
@@ -34,6 +41,17 @@ fn create_bitmap_info(width: i32, height: i32) -> BITMAPINFO {
   }
 }
 
+// code(core): def fn get_screen_size
+// code(core): use napi macro to label it
+
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
+
+// code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CXSCREEN
+// code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CYSCREEN
+// code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics
+// code(core): use fn sophia::geometry::Point::new to make point and as result
+
 #[napi]
 pub async fn get_screen_size() -> Result<Point> {
   let task = tokio::spawn(async move {
@@ -47,6 +65,27 @@ pub async fn get_screen_size() -> Result<Point> {
   handle_result(task).await
 }
 
+// code(core): def fn take_screenshot
+// code(core): use napi macro to label it
+
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn utils::handle_result to handle task
+
+// code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetDesktopWindow
+// code(core): use fn windows::Win32::Graphics::Gdi::GetDC
+// code(core): use fn windows::Win32::Graphics::Gdi::CreateCompatibleBitmap
+// code(core): use fn windows::Win32::Graphics::Gdi::SelectObject
+// code(core): use fn sophia::win::window::create_bitmap_info
+// code(core): get size width * height * 4 as usize
+// code(core): get buf as Vec<u8> with size
+// code(core): use fn windows::Win32::Graphics::Gdi::BitBlt
+// code(core): use const windows::Win32::Graphics::Gdi::SRCCOPY
+// code(core): use fn windows::Win32::Graphics::Gdi::GetDIBits
+// code(core): use const windows::Win32::Graphics::Gdi::DIB_RGB_COLORS
+// code(core): use fn windows::Win32::Graphics::Gdi::ReleaseDC
+// code(core): use fn windows::Win32::Graphics::Gdi::DeleteDC
+// code(core): use fn windows::Win32::Graphics::Gdi::DeleteObject
+// code(core): use struct sophia::screen::ImageData wrap image-data and return it
 #[napi]
 pub async fn take_screenshot(x: i32, y: i32, width: i32, height: i32) -> Result<ImageData> {
   let task = tokio::spawn(async move {
