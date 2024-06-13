@@ -1,5 +1,10 @@
 use napi_derive::napi;
 
+// code(core): def struct Point
+// code(core): use napi(object) macro to label struct Point
+// code(core): use derive(Debug, Clone) macro to label struct Point
+// code(core): impl struct Point with a method new
+
 #[napi(object)]
 #[derive(Debug, Clone)]
 pub struct Point {
@@ -12,6 +17,11 @@ impl Point {
     Self { x, y }
   }
 }
+
+// code(core): def struct Rect
+// code(core): use napi(object) macro to label struct Rect
+// code(core): use derive(Debug, Clone) macro to label struct Rect
+// code(core): impl struct Rect with a method new
 
 #[napi(object)]
 #[derive(Debug, Clone)]
