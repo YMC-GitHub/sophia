@@ -1,0 +1,40 @@
+- code(core): def enum MouseButton
+- code(core): use napi(object) macro to label it
+- code(core): with Left,Right,Middle prop and value (0,1,2)
+- code(core): def struct Mouse
+- code(core): use napi macro to label it
+- code(core): impl Mouse
+- code(core): use napi macro to label it
+- code(core): impl struct Mouse with a method mouse_move
+- code(core): use napi macro to label it and use move as js-name
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): impl struct Mouse with a method press
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): impl struct Mouse with a method release
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): impl struct Mouse with a method click
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): impl struct Mouse with a method get_position
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): def inner fn get_mouse_position_inner to get mouse position
+- code(core): use struct windows::Win32::Foundation::POINT to set mouse initial value
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetCursorPos to get mouse position
+- code(core): use fn sophia::geometry::Point::new to make point and as result
+- code(core): def inner fn mouse_event to handle mouse envet
+- code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSE_EVENT_FLAGS
+- code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CXSCREEN
+- code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CYSCREEN
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics
+- code(core): use fn  windows::Win32::UI::Input::KeyboardAndMouse::mouse_event
+- code(core): def inner fn mouse_move_inner to move mouse
+- code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_MOVE
+- code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_ABSOLUTE
