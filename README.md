@@ -140,6 +140,7 @@ I'm a big fan of [AutoHotkey](https://www.autohotkey.com/), but I want to use it
 - [AutoHotkey](https://github.com/AutoHotkey/AutoHotkey)
 - [PyAutoGUI](https://github.com/asweigart/pyautogui)
 - [RobotJS](https://github.com/octalmage/robotjs)
+- [Krombik/keysender](https://github.com/Krombik/keysender)
 
 ## License
 

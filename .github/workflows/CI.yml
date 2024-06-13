@@ -439,22 +439,32 @@ jobs:
       - name: List packages
         run: ls -R ./npm
         shell: bash
-      # https://runebook.dev/zh/docs/npm/generating-provenance-statements#google_vignette
-      - name: Publish
+      - name: publish
         run: |
+          echo "[build] do not care about version in commit-msg"
           npm config set provenance false
-          if git log -1 --pretty=%B | grep "[0-9]\+\.[0-9]\+\.[0-9]\+$";
-          then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm publish --access public
-          elif git log -1 --pretty=%B | grep "[0-9]\+\.[0-9]\+\.[0-9]\+";
-          then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm publish --tag next --access public
-          else
-            echo "Not a release, skipping publish"
-          fi
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          npm publish --access public
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # https://runebook.dev/zh/docs/npm/generating-provenance-statements#google_vignette
+      # - name: Publish
+      #   run: |
+      #     npm config set provenance false
+      #     if git log -1 --pretty=%B | grep "[0-9]\+\.[0-9]\+\.[0-9]\+$";
+      #     then
+      #       echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      #       npm publish --access public
+      #     elif git log -1 --pretty=%B | grep "[0-9]\+\.[0-9]\+\.[0-9]\+";
+      #     then
+      #       echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      #       npm publish --tag next --access public
+      #     else
+      #       echo "Not a release, skipping publish"
+      #     fi
+      #   shell: bash
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
