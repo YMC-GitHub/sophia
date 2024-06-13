@@ -1,0 +1,3 @@
+- code(core): use napi_derive 's fn napi
+- code(core): def fn fib
+- code(core): use napi macro to label it

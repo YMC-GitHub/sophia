@@ -1,0 +1,8 @@
+- code(core): def struct Point
+- code(core): use napi(object) macro to label struct Point
+- code(core): use derive(Debug, Clone) macro to label struct Point
+- code(core): impl struct Point with a method new
+- code(core): def struct Rect
+- code(core): use napi(object) macro to label struct Rect
+- code(core): use derive(Debug, Clone) macro to label struct Rect
+- code(core): impl struct Rect with a method new

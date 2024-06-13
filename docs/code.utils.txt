@@ -1,0 +1,13 @@
+- code(core): use napi's struct BigInt of bindgen_prelude mod
+- code(core): use napi's struct Error,Result,Status
+- code(core): def pub fn to transform bigint to i8,u8,i16,u16,i32,u32,i64,u64
+- code(core): def pub fn to transform bigint to usize
+- code(core): def pub fn to transform string to vec<u16>
+- code(core): use std::os::windows::prelude::OsStrExt::encode_wide
+- code(core): def pub fn to transform vec<u16> to string
+- code(core): def pub fn to handle result of async task from tokio
+- code(core): use struct tokio::task::JoinHandle
+- code(core): when match task.await handle result
+- code(core): when match Ok result get value if Operation ok
+- code(core): def err when operation fail with status and reason
+- code(core): def err when task join fail with status and reason
