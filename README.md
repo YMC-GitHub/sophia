@@ -141,6 +141,11 @@ I'm a big fan of [AutoHotkey](https://www.autohotkey.com/), but I want to use it
 - [PyAutoGUI](https://github.com/asweigart/pyautogui)
 - [RobotJS](https://github.com/octalmage/robotjs)
 - [Krombik/keysender](https://github.com/Krombik/keysender)
+- [deeean/sophia](https://github.com/deeean/sophia)
+- [miniben-90/x-win](https://github.com/miniben-90/x-win)
+- [rubickCenter/rubick-native](https://github.com/rubickCenter/rubick-native)
+- [nashaofu/node-screenshots](https://github.com/nashaofu/node-screenshots)
+- [LaunchMenu/node-global-key-listener](https://github.com/LaunchMenu/node-global-key-listener)
 
 ## License
 

@@ -22,8 +22,18 @@ export interface Color {
 export const MAGENTA: Color
 export function readImageData(path: string): Promise<ImageData>
 export function saveImageData(path: string, imageData: ImageData): Promise<void>
-export function imageSearch(source: ImageData, target: ImageData, variant?: number | undefined | null, transColor?: Color | undefined | null): Promise<Point | null>
-export function multipleImageSearch(source: ImageData, target: ImageData, variant?: number | undefined | null, transColor?: Color | undefined | null): Promise<Array<Point>>
+export function imageSearch(
+  source: ImageData,
+  target: ImageData,
+  variant?: number | undefined | null,
+  transColor?: Color | undefined | null,
+): Promise<Point | null>
+export function multipleImageSearch(
+  source: ImageData,
+  target: ImageData,
+  variant?: number | undefined | null,
+  transColor?: Color | undefined | null,
+): Promise<Array<Point>>
 export const enum Modifiers {
   Alt = 1,
   AltGraph = 2,
@@ -38,7 +48,7 @@ export const enum Modifiers {
   Symbol = 1024,
   SymbolLock = 2048,
   Hyper = 4096,
-  Super = 8192
+  Super = 8192,
 }
 export const enum Key {
   None = 0,
@@ -151,7 +161,7 @@ export const enum Key {
   LeftControl = 162,
   RightControl = 163,
   LeftAlt = 164,
-  RightAlt = 165
+  RightAlt = 165,
 }
 export interface Process {
   pid: number
@@ -176,14 +186,14 @@ export const enum ProcessAccess {
   VmRead = 15,
   VmWrite = 16,
   WriteDac = 17,
-  WriteOwner = 18
+  WriteOwner = 18,
 }
 export function openProcess(access: ProcessAccess, pid: number): Promise<OpenedProcess>
 export function getProcesses(): Promise<Array<Process>>
 export const enum MouseButton {
   Left = 0,
   Right = 1,
-  Middle = 2
+  Middle = 2,
 }
 export function getScreenSize(): Promise<Point>
 export function takeScreenshot(x: number, y: number, width: number, height: number): Promise<ImageData>
