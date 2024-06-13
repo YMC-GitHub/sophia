@@ -12,3 +12,12 @@ yarn.lock
 __test__
 renovate.json
 .idea
+
+**/*.md
+LICENSE
+**/*.gitignore
+editorconfig
+docs/**
+
+# src
+# examples

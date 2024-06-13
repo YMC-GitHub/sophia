@@ -1,6 +1,6 @@
 {
   "name": "@yors/sophia",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "a project name sophia",
   "keywords": [
     "AutoHotkey",
@@ -74,10 +74,6 @@
   "engines": {
     "node": ">= 10"
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
   "napi": {
     "name": "sophia",
     "triples": {
@@ -117,5 +113,12 @@
     "*.toml": [
       "taplo format"
     ]
+  },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "optionalDependencies": {
+    "@yors/sophia-win32-x64-msvc": "0.1.0"
   }
 }
