@@ -18,6 +18,8 @@
 - Window
 - Memory
 
+get more info in [CHANELOG.md](./CHANELOG.md)
+
 ## Installation
 
 ```bash
@@ -142,10 +144,15 @@ I'm a big fan of [AutoHotkey](https://www.autohotkey.com/), but I want to use it
 - [RobotJS](https://github.com/octalmage/robotjs)
 - [Krombik/keysender](https://github.com/Krombik/keysender)
 - [deeean/sophia](https://github.com/deeean/sophia)
+
+## Thanks
+
 - [miniben-90/x-win](https://github.com/miniben-90/x-win)
 - [rubickCenter/rubick-native](https://github.com/rubickCenter/rubick-native)
 - [nashaofu/node-screenshots](https://github.com/nashaofu/node-screenshots)
 - [LaunchMenu/node-global-key-listener](https://github.com/LaunchMenu/node-global-key-listener)
+
+- [dimusic/active-win-pos-rs](https://github.com/dimusic/active-win-pos-rs)
 
 ## License
 

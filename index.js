@@ -62,7 +62,9 @@ switch (platform) {
   case 'win32':
     switch (arch) {
       case 'x64':
-        localFileExisted = existsSync(join(__dirname, 'sophia.win32-x64-msvc.node'))
+        localFileExisted = existsSync(
+          join(__dirname, 'sophia.win32-x64-msvc.node')
+        )
         try {
           if (localFileExisted) {
             nativeBinding = require('./sophia.win32-x64-msvc.node')
@@ -74,7 +76,9 @@ switch (platform) {
         }
         break
       case 'ia32':
-        localFileExisted = existsSync(join(__dirname, 'sophia.win32-ia32-msvc.node'))
+        localFileExisted = existsSync(
+          join(__dirname, 'sophia.win32-ia32-msvc.node')
+        )
         try {
           if (localFileExisted) {
             nativeBinding = require('./sophia.win32-ia32-msvc.node')
@@ -86,7 +90,9 @@ switch (platform) {
         }
         break
       case 'arm64':
-        localFileExisted = existsSync(join(__dirname, 'sophia.win32-arm64-msvc.node'))
+        localFileExisted = existsSync(
+          join(__dirname, 'sophia.win32-arm64-msvc.node')
+        )
         try {
           if (localFileExisted) {
             nativeBinding = require('./sophia.win32-arm64-msvc.node')
@@ -125,7 +131,9 @@ switch (platform) {
         }
         break
       case 'arm64':
-        localFileExisted = existsSync(join(__dirname, 'sophia.darwin-arm64.node'))
+        localFileExisted = existsSync(
+          join(__dirname, 'sophia.darwin-arm64.node')
+        )
         try {
           if (localFileExisted) {
             nativeBinding = require('./sophia.darwin-arm64.node')
@@ -159,7 +167,9 @@ switch (platform) {
     switch (arch) {
       case 'x64':
         if (isMusl()) {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-x64-musl.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-x64-musl.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-x64-musl.node')
@@ -170,7 +180,9 @@ switch (platform) {
             loadError = e
           }
         } else {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-x64-gnu.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-x64-gnu.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-x64-gnu.node')
@@ -184,7 +196,9 @@ switch (platform) {
         break
       case 'arm64':
         if (isMusl()) {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-arm64-musl.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-arm64-musl.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-arm64-musl.node')
@@ -195,7 +209,9 @@ switch (platform) {
             loadError = e
           }
         } else {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-arm64-gnu.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-arm64-gnu.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-arm64-gnu.node')
@@ -209,7 +225,9 @@ switch (platform) {
         break
       case 'arm':
         if (isMusl()) {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-arm-musleabihf.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-arm-musleabihf.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-arm-musleabihf.node')
@@ -220,7 +238,9 @@ switch (platform) {
             loadError = e
           }
         } else {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-arm-gnueabihf.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-arm-gnueabihf.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-arm-gnueabihf.node')
@@ -234,7 +254,9 @@ switch (platform) {
         break
       case 'riscv64':
         if (isMusl()) {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-riscv64-musl.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-riscv64-musl.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-riscv64-musl.node')
@@ -245,7 +267,9 @@ switch (platform) {
             loadError = e
           }
         } else {
-          localFileExisted = existsSync(join(__dirname, 'sophia.linux-riscv64-gnu.node'))
+          localFileExisted = existsSync(
+            join(__dirname, 'sophia.linux-riscv64-gnu.node')
+          )
           try {
             if (localFileExisted) {
               nativeBinding = require('./sophia.linux-riscv64-gnu.node')
@@ -258,7 +282,9 @@ switch (platform) {
         }
         break
       case 's390x':
-        localFileExisted = existsSync(join(__dirname, 'sophia.linux-s390x-gnu.node'))
+        localFileExisted = existsSync(
+          join(__dirname, 'sophia.linux-s390x-gnu.node')
+        )
         try {
           if (localFileExisted) {
             nativeBinding = require('./sophia.linux-s390x-gnu.node')
@@ -284,27 +310,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const {
-  fib,
-  ImageData,
-  MAGENTA,
-  readImageData,
-  saveImageData,
-  imageSearch,
-  multipleImageSearch,
-  Modifiers,
-  Key,
-  Keyboard,
-  ProcessAccess,
-  OpenedProcess,
-  openProcess,
-  getProcesses,
-  MouseButton,
-  Mouse,
-  getScreenSize,
-  takeScreenshot,
-  Window,
-} = nativeBinding
+const { fib, ImageData, MAGENTA, readImageData, saveImageData, imageSearch, multipleImageSearch, Modifiers, Key, Keyboard, ProcessAccess, OpenedProcess, openProcess, getProcesses, MouseButton, Mouse, getScreenSize, takeScreenshot, Window, getWindows, getWindowByName, fromContainsName, findWindowByClassName, getForegroundWindow } = nativeBinding
 
 module.exports.fib = fib
 module.exports.ImageData = ImageData
@@ -325,3 +331,8 @@ module.exports.Mouse = Mouse
 module.exports.getScreenSize = getScreenSize
 module.exports.takeScreenshot = takeScreenshot
 module.exports.Window = Window
+module.exports.getWindows = getWindows
+module.exports.getWindowByName = getWindowByName
+module.exports.fromContainsName = fromContainsName
+module.exports.findWindowByClassName = findWindowByClassName
+module.exports.getForegroundWindow = getForegroundWindow

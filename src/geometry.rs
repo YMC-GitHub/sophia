@@ -42,3 +42,28 @@ impl Rect {
     }
   }
 }
+
+// code(core): def struct WindowView
+// code(core): use napi(object) macro to label it
+// code(core): use derive(Debug, Clone) macro to label it
+// code(core): impl struct WindowView with a method new
+
+#[napi(object)]
+#[derive(Debug, Clone)]
+pub struct WindowView {
+  pub x: i32,
+  pub y: i32,
+  pub width: i32,
+  pub height: i32,
+}
+
+impl WindowView {
+  pub fn new(left: i32, top: i32, right: i32, bottom: i32) -> Self {
+    Self {
+      x: left,
+      y: top,
+      width: right,
+      height: bottom,
+    }
+  }
+}

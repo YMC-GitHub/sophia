@@ -14,6 +14,12 @@ export interface Rect {
   right: number
   bottom: number
 }
+export interface WindowView {
+  x: number
+  y: number
+  width: number
+  height: number
+}
 export interface Color {
   r: number
   g: number
@@ -22,18 +28,8 @@ export interface Color {
 export const MAGENTA: Color
 export function readImageData(path: string): Promise<ImageData>
 export function saveImageData(path: string, imageData: ImageData): Promise<void>
-export function imageSearch(
-  source: ImageData,
-  target: ImageData,
-  variant?: number | undefined | null,
-  transColor?: Color | undefined | null,
-): Promise<Point | null>
-export function multipleImageSearch(
-  source: ImageData,
-  target: ImageData,
-  variant?: number | undefined | null,
-  transColor?: Color | undefined | null,
-): Promise<Array<Point>>
+export function imageSearch(source: ImageData, target: ImageData, variant?: number | undefined | null, transColor?: Color | undefined | null): Promise<Point | null>
+export function multipleImageSearch(source: ImageData, target: ImageData, variant?: number | undefined | null, transColor?: Color | undefined | null): Promise<Array<Point>>
 export const enum Modifiers {
   Alt = 1,
   AltGraph = 2,
@@ -48,7 +44,7 @@ export const enum Modifiers {
   Symbol = 1024,
   SymbolLock = 2048,
   Hyper = 4096,
-  Super = 8192,
+  Super = 8192
 }
 export const enum Key {
   None = 0,
@@ -161,7 +157,7 @@ export const enum Key {
   LeftControl = 162,
   RightControl = 163,
   LeftAlt = 164,
-  RightAlt = 165,
+  RightAlt = 165
 }
 export interface Process {
   pid: number
@@ -186,17 +182,44 @@ export const enum ProcessAccess {
   VmRead = 15,
   VmWrite = 16,
   WriteDac = 17,
-  WriteOwner = 18,
+  WriteOwner = 18
 }
 export function openProcess(access: ProcessAccess, pid: number): Promise<OpenedProcess>
 export function getProcesses(): Promise<Array<Process>>
 export const enum MouseButton {
   Left = 0,
   Right = 1,
-  Middle = 2,
+  Middle = 2
 }
 export function getScreenSize(): Promise<Point>
 export function takeScreenshot(x: number, y: number, width: number, height: number): Promise<ImageData>
+export function getWindows(): Promise<Array<Window>>
+/**
+ * Creates a `Window` instance from a window name.
+ *
+ * # Arguments
+ *
+ * * `title` - The name of the window.
+ *
+ * # Returns
+ *
+ * Returns `None` if the window is not found.
+ */
+export function getWindowByName(title: string): Promise<Window | null>
+/**
+ * Creates a `Window` instance from a window name substring.
+ *
+ * # Arguments
+ *
+ * * `title` - The substring to search for in window names.
+ *
+ * # Returns
+ *
+ * Returns `None` if the window is not found.
+ */
+export function fromContainsName(title: string): Promise<Window | null>
+export function findWindowByClassName(classname: string): Promise<Window | null>
+export function getForegroundWindow(): Promise<Window | null>
 export class ImageData {
   data: Array<number>
   width: number
@@ -272,11 +295,46 @@ export class Window {
   minimize(): Promise<void>
   maximize(): Promise<void>
   getTitle(): Promise<string>
+  getClassName(): Promise<string>
   getWindowRect(): Promise<Rect>
   setPosition(x: number, y: number): Promise<void>
   setSize(width: number, height: number): Promise<void>
+  isForeground(): Promise<boolean>
   foreground(): Promise<boolean>
+  setForeground(): Promise<boolean>
+  isOpen(): Promise<boolean>
+  isMinimized(): Promise<boolean>
+  show(): Promise<boolean>
   static getForegroundWindow(): Promise<Window | null>
   static findWindowByTitle(title: string): Promise<Window | null>
+  enumerate(): Promise<Array<Window>>
+  isVisible(): Promise<boolean>
+  getId(): Promise<number>
+  asRawHwnd(): Promise<Window | null>
+  /**
+   * Creates a `Window` instance from a window name.
+   *
+   * # Arguments
+   *
+   * * `title` - The name of the window.
+   *
+   * # Returns
+   *
+   * Returns `None` if the window is not found.
+   */
+  static fromName(title: string): Promise<Window | null>
+  /**
+   * Creates a `Window` instance from a window name substring.
+   *
+   * # Arguments
+   *
+   * * `title` - The substring to search for in window names.
+   *
+   * # Returns
+   *
+   * Returns `None` if the window is not found.
+   */
+  static fromContainsName(title: string): Promise<Window | null>
   static findWindowByClassName(classname: string): Promise<Window | null>
+  capture(): Promise<ImageData>
 }

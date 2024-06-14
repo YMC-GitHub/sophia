@@ -19,6 +19,12 @@
 - code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW
 - code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetWindowTextW
 - code(core): use fn sophia::utils::decode_wide
+- code(core): impl struct Window with a method get_class_name
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetClassNameW
+- code(core): use fn sophia::utils::decode_wide
 - code(core): impl struct Window with a method get_window_rect
 - code(core): use napi macro to label it
 - code(core): use fn tokio::spawn to make async task
@@ -39,6 +45,11 @@
 - code(core): use napi macro to label it
 - code(core): use const windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE
 - code(core): use inner fn self.set_window_pos
+- code(core): impl struct Window with a method is_foreground
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn sophia::utils::handle_result to handle task
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow
 - code(core): impl struct Window with a method foreground
 - code(core): use napi macro to label it
 - code(core): use fn tokio::spawn to make async task
@@ -46,6 +57,19 @@
 - code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL
 - code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync
 - code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow
+- code(core): impl struct Window with a method set_foreground
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn sophia::utils::handle_result to handle task
+- code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow
+- code(core): impl struct Window with a method show
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn sophia::utils::handle_result to handle task
+- code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync
 - code(core): impl struct Window with a method inner fn set_window_pos
 - code(core): use fn tokio::spawn to make async task
 - code(core): use fn sophia::utils::handle_result to handle task
@@ -70,3 +94,20 @@
 - code(core): use fn sophia::utils::encode_wide to transform str to buf
 - code(core): use struct windows_core::strings::pcwstr::PCWSTR
 - code(core): use fn windows::Win32::UI::WindowsAndMessaging::FindWindowW
+- code(core): def fn capture
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn utils::handle_result to handle task
+- code(core): use fn win_screenshot::capture to capture window
+- code(core): impl struct Window with a method find_window_by_class_name
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn sophia::utils::handle_result to handle task
+- code(core): use fn sophia::utils::encode_wide to transform str to buf
+- code(core): use struct windows_core::strings::pcwstr::PCWSTR
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::FindWindowW
+- code(core): impl struct Window with a method get_foreground_window
+- code(core): use napi macro to label it
+- code(core): use fn tokio::spawn to make async task
+- code(core): use fn sophia::utils::handle_result to handle task
+- code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow

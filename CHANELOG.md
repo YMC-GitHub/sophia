@@ -1,0 +1,24 @@
+- feat(core): window minimize/maximize
+- feat(core): window get title
+- feat(core): window get class name
+- feat(core): window get window rect
+- feat(core): window set_position
+- feat(core): window set_size
+- feat(core): window is_foreground
+- feat(core): window set_foreground
+- feat(core): window is_open
+- feat(core): window is_minimized
+- feat(core): window is_visible
+- feat(core): window show
+- feat(core): get_foreground_window
+- feat(core): find_window_by_title
+- feat(core): window get_id
+- feat(core): from_name
+- feat(core): from_contains_name
+- feat(core): find_window_by_class_name
+- feat(core): window capture
+- feat(core): get_windows
+- feat(core): get_window_by_name
+- feat(core): from_contains_name
+- feat(core): get_foreground_window
+- feat(core): find_window_by_class_name
