@@ -26,6 +26,28 @@ use std::ptr;
 // use win_screenshot::prelude::*;
 // use win_screenshot::capture::capture_window;
 
+// pub async fn get_window_rect(hwnd: HWND) -> Result<Rect> {
+//   let task = tokio::spawn(async move {
+//     let mut rect = windows::Win32::Foundation::RECT::default();
+
+//     unsafe {
+//       let _ = windows::Win32::UI::WindowsAndMessaging::GetWindowRect(hwnd, &mut rect);
+//     }
+//     Ok(Rect::new(rect.left, rect.top, rect.right, rect.bottom))
+//   });
+
+//   handle_result(task).await
+// }
+
+pub fn get_window_rect_sync(hwnd: HWND) -> Rect {
+  let mut rect = windows::Win32::Foundation::RECT::default();
+
+  unsafe {
+    let _ = windows::Win32::UI::WindowsAndMessaging::GetWindowRect(hwnd, &mut rect);
+  }
+  Rect::new(rect.left, rect.top, rect.right, rect.bottom)
+}
+
 // use active_win_pos_rs::get_active_window;
 // code(core): def struct Window
 // code(core): use napi macro to label it
@@ -56,6 +78,7 @@ pub struct Window {
 // feat(core): from_contains_name
 // feat(core): find_window_by_class_name
 // feat(core): window capture
+// feat(core): window capture rect
 
 // feat(core): get_windows
 // feat(core): get_window_by_name
@@ -151,12 +174,13 @@ impl Window {
         let _ = windows::Win32::UI::WindowsAndMessaging::GetWindowRect(hwnd, &mut rect);
       }
 
-      Ok(Rect {
-        left: rect.left,
-        top: rect.top,
-        right: rect.right,
-        bottom: rect.bottom,
-      })
+      // Ok(Rect {
+      //   left: rect.left,
+      //   top: rect.top,
+      //   right: rect.right,
+      //   bottom: rect.bottom,
+      // })
+      Ok(Rect::new(rect.left, rect.top, rect.right, rect.bottom))
     });
 
     handle_result(task).await
@@ -589,10 +613,12 @@ impl Window {
   #[napi]
   pub async fn capture(&self) -> Result<ImageData> {
     let hwnd = self.hwnd;
-    // if !unsafe { IsIconic(hwnd).as_bool() } {
+    // if unsafe { IsIconic(hwnd).as_bool() } {
+    // set window to unminmized
     //   unsafe {
     //     let _ = ShowWindowAsync(hwnd, SW_SHOWNORMAL);
     //   };
+    //  active
     //   unsafe { SetForegroundWindow(hwnd) };
     // }
 
@@ -600,6 +626,44 @@ impl Window {
       // let hwnd = GetDesktopWindow();
 
       let buf = win_screenshot::capture::capture_window(hwnd.0).unwrap();
+      let w: u32 = buf.width;
+      let h: u32 = buf.height;
+
+      Ok(ImageData {
+        data: buf.pixels,
+        width: buf.width,
+        height: buf.height,
+        pixel_width: (4 * w * h) as u8,
+      })
+    });
+
+    handle_result(task).await
+  }
+
+  #[napi]
+  pub async fn capture_area(&self, x: i32, y: i32, width: i32, height: i32) -> Result<ImageData> {
+    let hwnd = self.hwnd;
+
+    // let rect = get_window_rect_sync(hwnd);
+
+    let task = tokio::spawn(async move {
+      // let hwnd = GetDesktopWindow();
+      // PrintWindow much slower, much more reliable
+      let using = win_screenshot::capture::Using::PrintWindow;
+
+      // Capture client area of window
+      let area = win_screenshot::capture::Area::ClientOnly;
+      // Capture whole window (not supported with BitBlt)
+      // let area = Area::Full;
+
+      // Build-in crop, faster on large windows
+      // let crop_xy = None; //Some([100, 100]);
+      // let crop_wh = None; //Some([300, 300]);
+      let crop_xy = Some([x, y]);
+      let crop_wh = Some([width, height]);
+
+      let buf =
+        win_screenshot::capture::capture_window_ex(hwnd.0, using, area, crop_xy, crop_wh).unwrap();
       let w: u32 = buf.width;
       let h: u32 = buf.height;
 
@@ -649,6 +713,7 @@ pub async fn get_windows() -> Result<Vec<Window>> {
 
   handle_result(task).await
 }
+
 // https://github.com/NiiightmareXD/windows-capture/blob/main/src/window.rs#L77
 /// Creates a `Window` instance from a window name.
 ///
@@ -747,5 +812,6 @@ pub async fn get_foreground_window() -> Result<Option<Window>> {
   handle_result(task).await
 }
 
+// FindWindowProp
 // relaive project or code:
 // https://github.com/NiiightmareXD/windows-capture/blob/main/src/window.rs

@@ -13,6 +13,8 @@ export interface Rect {
   top: number
   right: number
   bottom: number
+  width: number
+  height: number
 }
 export interface WindowView {
   x: number
@@ -337,4 +339,5 @@ export class Window {
   static fromContainsName(title: string): Promise<Window | null>
   static findWindowByClassName(classname: string): Promise<Window | null>
   capture(): Promise<ImageData>
+  captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

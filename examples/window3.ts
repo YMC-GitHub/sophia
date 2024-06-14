@@ -20,7 +20,7 @@ const INTERSECTION_OFFSETS_LEN = INTERSECTION_OFFSETS.length
 const { log } = console
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-function getView(rect: Rect) {
+function getRect(rect: Rect) {
   let { left, top, right, bottom } = rect
   return {
     x: left,
@@ -29,9 +29,16 @@ function getView(rect: Rect) {
     height: bottom - top,
   }
 }
+function jsonstro(json: any, trim: boolean = true) {
+  let text = typeof json == 'string' ? json : JSON.stringify(json, null, 0)
+  if (trim) {
+    text = text.replace(/,"/gi, ',').replace(/":/gi, ':').replace(/{"/gi, '{')
+  }
+  return text
+}
 async function main() {
-  let screenSize = await getScreenSize()
-
+  // let screenSize = await getScreenSize()
+  log(`[zero] read all window:`)
   let windows = await getWindows()
   // // info windows title
   // let task = windows.map(async (v) => await v.getTitle())
@@ -53,13 +60,19 @@ async function main() {
       className: await v.getClassName(),
     }
   })
-  log(await Promise.all(task4))
+  let wins = await Promise.all(task4)
+  // log(jsonstro(wins))
+  log(wins)
 
+  log(`[zero] read window by title:`)
   let title: string = ''
   //  find window contains title 'Windows PowerShell'
   title = 'Windows PowerShell'
   //  find window contains title 'Clash for Windows'
   title = 'Clash for Windows'
+  // window3.ts - sophia - Visual Studio Code
+
+  title = 'window3.ts - sophia - Visual Studio Code'
 
   let window = await Window.fromContainsName(title)
   // window = await Window.getForegroundWindow()
@@ -71,9 +84,10 @@ async function main() {
     // log(await Promise.all(task))
 
     let rect = await window.getWindowRect()
-    log(rect)
+    log(`[zero] window rect:`)
+    log(jsonstro(rect))
     let title = await window.getTitle()
-    log(title)
+    log(`[zero] window title:`, title)
 
     let imgdata: ImageData
     let isopened = await window.isOpen()
@@ -98,9 +112,19 @@ async function main() {
       await sleep(100)
       // Promise.race()
     }
+
+    log(`[zero] window current rect:`)
     rect = await window.getWindowRect()
-    log(rect)
+    log(jsonstro(rect))
+
+    log(`[zero] window capture view:`)
     imgdata = await window.capture()
+    await saveImageData(`runtime-images-sync-window.png`, imgdata)
+
+    log(`[zero] window capture rect:`)
+    let { width, height } = getRect(rect)
+    imgdata = await window.captureArea(width / 2 - 50, height / 2 - 50, 100, 100)
+    await saveImageData(`runtime-images-sync-window-rect-01.png`, imgdata)
 
     // // imgdata = await window.capture(rect.left + 0, rect.top + 0, rect.left + 100, rect.top + 100)
     // // imgdata = await takeScreenshot(0, 0, screenSize.x, screenSize.y)
@@ -117,8 +141,6 @@ async function main() {
     // imgdata = await window.capture(left, top, right, bottom)
 
     // // imgdata = await window.capture(0, 0, rect.left + 100, rect.top + 100)
-
-    await saveImageData(`runtime-images-sync-window.png`, imgdata)
   }
 }
 main()

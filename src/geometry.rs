@@ -30,6 +30,8 @@ pub struct Rect {
   pub top: i32,
   pub right: i32,
   pub bottom: i32,
+  pub width: i32,
+  pub height: i32,
 }
 
 impl Rect {
@@ -39,7 +41,12 @@ impl Rect {
       top,
       right,
       bottom,
+      width: right - left,
+      height: bottom - top,
     }
+  }
+  pub fn default() -> Self {
+    Self::new(0, 0, 255, 255)
   }
 }
 
@@ -67,3 +74,31 @@ impl WindowView {
     }
   }
 }
+
+// - code(core): def struct FindWindowProp
+// - code(core): use napi(object) macro to label it
+// - code(core): use derive(Debug, Clone) macro to label it
+// - code(core): with prop psid,name,title,class_name
+// - code(core): impl struct FindWindowProp with a method new
+// #[napi(object)]
+// #[derive(Debug, Clone)]
+// pub struct FindWindowProp {
+//   pub psid: i32,
+//   pub name: String,
+//   pub title: String,
+//   pub class_name: String,
+// }
+
+// impl FindWindowProp {
+//   pub fn new(psid: i32, name: String, title: String, class_name: String) -> Self {
+//     Self {
+//       psid,
+//       name,
+//       title,
+//       class_name,
+//     }
+//   }
+//   pub fn default() -> Self {
+//     Self::new(-1 as i32, "".to_string(), "".to_string(), "".to_string())
+//   }
+// }
