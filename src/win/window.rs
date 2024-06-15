@@ -2,9 +2,9 @@ use crate::geometry::{Point, Rect, WindowMetaInfo};
 use crate::screen::ImageData;
 use crate::utils::{encode_wide, handle_result};
 use crate::win::utils::{
-  get_mouse_position_in_window, get_window_class_name, get_window_meta_info, get_window_pid,
-  get_window_rect, get_window_title_next, is_foreground_window, is_minimize_window, is_open_window,
-  set_active_window, set_show_window, set_window_pos, show_window,
+  close_window, get_mouse_position_in_window, get_window_class_name, get_window_meta_info,
+  get_window_pid, get_window_rect, get_window_title_next, is_foreground_window, is_minimize_window,
+  is_open_window, set_active_window, set_show_window, set_window_pos, show_window,
 };
 
 use napi::bindgen_prelude::*;
@@ -18,19 +18,14 @@ use windows::Win32::System::Threading::GetCurrentProcessId;
 // set foreground window with SetForegroundWindow
 use windows::Win32::UI::WindowsAndMessaging::{
   EnumChildWindows, FindWindowW, GetClientRect, GetDesktopWindow, GetForegroundWindow,
-  GetWindowLongPtrW, GetWindowThreadProcessId, IsWindowVisible, SetWindowPos, GWL_EXSTYLE,
-  GWL_STYLE, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE,
-  SW_MINIMIZE, WS_CHILD, WS_EX_TOOLWINDOW,
+  GetWindowLongPtrW, GetWindowThreadProcessId, IsWindowVisible, GWL_EXSTYLE, GWL_STYLE,
+  SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
+  WS_CHILD, WS_EX_TOOLWINDOW,
 };
 //
 // https://itecnotes.com/tecnote/c-how-to-verify-if-a-window-of-another-program-is-minimized
 
 // [about findwindowexa in cpp](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-findwindowexa)
-
-// use windows::Win32::Graphics::Gdi::{
-//   BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetDIBits,
-//   ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, RGBQUAD, SRCCOPY,
-// };
 
 use std::ptr;
 
@@ -260,6 +255,19 @@ impl Window {
   pub async fn maximize(&self) -> Result<()> {
     self.show_window(SW_MAXIMIZE).await
   }
+
+  #[napi]
+  pub async fn close(&self) -> Result<()> {
+    let hwnd = self.hwnd;
+    let task = tokio::spawn(async move {
+      close_window(hwnd);
+      Ok(())
+    });
+
+    handle_result(task).await
+  }
+
+  // close_window
 
   #[napi]
   pub async fn is_visible(&self) -> Result<bool> {

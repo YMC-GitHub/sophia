@@ -324,6 +324,7 @@ export class Window {
   show(): Promise<boolean>
   minimize(): Promise<void>
   maximize(): Promise<void>
+  close(): Promise<void>
   isVisible(): Promise<boolean>
   capture(): Promise<ImageData>
   captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>

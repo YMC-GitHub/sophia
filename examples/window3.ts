@@ -72,7 +72,7 @@ async function main() {
   title = 'Clash for Windows'
   // window3.ts - sophia - Visual Studio Code
 
-  title = 'window3.ts - sophia - Visual Studio Code'
+  // title = 'window3.ts - sophia - Visual Studio Code'
 
   let window = await Window.fromContainsName(title)
   // window = await Window.getForegroundWindow()
@@ -137,18 +137,16 @@ async function main() {
     log(jsonstro(pos))
     log(`[zero] window get by id:`)
     let winx = await window.getWindowByPid(pid)
+
     if (winx) {
-      let task4 = [winx].map(async (v) => {
-        return {
-          title: await v.getTitle(),
-          rect: await v.getWindowRect(),
-          id: await v.getId(),
-          className: await v.getClassName(),
-        }
-      })
-      let wins = await Promise.all(task4)
-      // log(jsonstro(wins))
-      log(wins)
+      log(`[zero] window get meta info when window found:`)
+      let info = await winx.getWindowMetaInfo()
+      log(jsonstro(info))
+    }
+
+    if (winx) {
+      log(`[zero] window close:`)
+      await winx.close()
     }
   }
 }

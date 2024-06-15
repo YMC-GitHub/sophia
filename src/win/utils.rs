@@ -94,11 +94,12 @@ use crate::utils::{decode_wide, encode_wide};
 use windows::core::{HSTRING, PCWSTR};
 // use windows::Win32::Foundation::HANDLE;
 use windows::Win32::{
-  Foundation::{FALSE, HANDLE, HWND},
+  Foundation::{FALSE, HANDLE, HWND, LPARAM, WPARAM},
   UI::WindowsAndMessaging::{
     FindWindowW, GetClassNameW, GetForegroundWindow, GetWindowTextLengthW, GetWindowTextW,
-    GetWindowThreadProcessId, IsIconic, IsWindow, SetForegroundWindow, SetWindowPos, ShowWindow,
-    ShowWindowAsync, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_SHOWNORMAL,
+    GetWindowThreadProcessId, IsIconic, IsWindow, SendMessageA, SetForegroundWindow, SetWindowPos,
+    ShowWindow, ShowWindowAsync, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_SHOWNORMAL, WM_CLOSE,
+    WM_NULL,
   },
 };
 
@@ -303,6 +304,17 @@ pub fn set_window_pos(
 ) -> () {
   unsafe {
     let _ = SetWindowPos(hwnd, None, x, y, width, height, flags);
+  }
+  ()
+}
+// SendMessage,WM_CLOSE
+// [about wparam and lparam in cpp](https://blog.csdn.net/weixin_45525272/article/details/104301731)
+// [close a window using the SendMessage in cpp](https://cplusplus.com/forum/windows/171648/)
+// SendMessage ( hwnd, WM_CLOSE, NULL, NULL ) ;
+// https://github.com/microsoft/windows-rs/issues/1631
+pub fn close_window(hwnd: HWND) -> () {
+  unsafe {
+    SendMessageA(hwnd, WM_CLOSE, WPARAM(0), LPARAM(0));
   }
   ()
 }
