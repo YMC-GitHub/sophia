@@ -22,6 +22,12 @@ export interface WindowView {
   width: number
   height: number
 }
+export interface WindowMetaInfo {
+  id: number
+  title: string
+  className: string
+  rect: Rect
+}
 export interface Color {
   r: number
   g: number
@@ -195,7 +201,9 @@ export const enum MouseButton {
 }
 export function getScreenSize(): Promise<Point>
 export function takeScreenshot(x: number, y: number, width: number, height: number): Promise<ImageData>
+export function listWindow(): Promise<Array<Window>>
 export function getWindows(): Promise<Array<Window>>
+export function getWindowByPid(pid: number): Promise<Window | null>
 /**
  * Creates a `Window` instance from a window name.
  *
@@ -216,10 +224,16 @@ export function getWindowByName(title: string): Promise<Window | null>
  * * `title` - The substring to search for in window names.
  *
  * # Returns
- *
+ *s
  * Returns `None` if the window is not found.
  */
 export function fromContainsName(title: string): Promise<Window | null>
+/**
+ * get a `Window` instance from a window name substring.
+ *
+ * alias of from_contains_name
+ */
+export function getWindowContainsTitle(title: string): Promise<Window | null>
 export function findWindowByClassName(classname: string): Promise<Window | null>
 export function getForegroundWindow(): Promise<Window | null>
 export class ImageData {
@@ -294,11 +308,12 @@ export class Mouse {
   static getPosition(): Promise<Point>
 }
 export class Window {
-  minimize(): Promise<void>
-  maximize(): Promise<void>
+  getId(): Promise<number>
   getTitle(): Promise<string>
   getClassName(): Promise<string>
   getWindowRect(): Promise<Rect>
+  getMousePos(): Promise<Point>
+  getWindowMetaInfo(): Promise<WindowMetaInfo>
   setPosition(x: number, y: number): Promise<void>
   setSize(width: number, height: number): Promise<void>
   isForeground(): Promise<boolean>
@@ -307,12 +322,14 @@ export class Window {
   isOpen(): Promise<boolean>
   isMinimized(): Promise<boolean>
   show(): Promise<boolean>
+  minimize(): Promise<void>
+  maximize(): Promise<void>
+  isVisible(): Promise<boolean>
+  capture(): Promise<ImageData>
+  captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
+  getWindowByPid(pid: number): Promise<Window | null>
   static getForegroundWindow(): Promise<Window | null>
   static findWindowByTitle(title: string): Promise<Window | null>
-  enumerate(): Promise<Array<Window>>
-  isVisible(): Promise<boolean>
-  getId(): Promise<number>
-  asRawHwnd(): Promise<Window | null>
   /**
    * Creates a `Window` instance from a window name.
    *
@@ -338,6 +355,4 @@ export class Window {
    */
   static fromContainsName(title: string): Promise<Window | null>
   static findWindowByClassName(classname: string): Promise<Window | null>
-  capture(): Promise<ImageData>
-  captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

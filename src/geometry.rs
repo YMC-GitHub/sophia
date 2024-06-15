@@ -75,6 +75,15 @@ impl WindowView {
   }
 }
 
+#[napi(object)]
+#[derive(Debug, Clone)]
+pub struct WindowMetaInfo {
+  pub id: u32,
+  pub title: String,
+  pub class_name: String,
+  pub rect: Rect,
+}
+
 // - code(core): def struct FindWindowProp
 // - code(core): use napi(object) macro to label it
 // - code(core): use derive(Debug, Clone) macro to label it

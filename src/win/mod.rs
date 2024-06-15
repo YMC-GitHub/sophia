@@ -4,12 +4,16 @@
 // code(core): use ./screen.rs as pub mod screen
 // code(core): use ./window.rs as pub mod window
 // - code(core): use ./utils.rs as pub mod utils
+// - code(core): use ./workwindow.rs as pub mod workwindow
+
 pub mod keyboard;
 pub mod memory;
 pub mod mouse;
 pub mod screen;
-// pub mod utils;
+pub mod utils;
 pub mod window;
+// pub mod workwindow;
+
 // next:
 // mod platform_api;
 // mod window_position;

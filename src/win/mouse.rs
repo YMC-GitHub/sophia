@@ -11,6 +11,16 @@ use windows::Win32::UI::WindowsAndMessaging::{
   GetCursorPos, GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN,
 };
 
+// feat(core): mouse button enum
+// feat(core): mouse move
+// feat(core): mouse press with button type
+// feat(core): mouse release with button type
+// feat(core): mouse click with button type
+// feat(core): mouse get position
+
+// todo(core): mouse scroll wheel Krombik/keysender's mouse
+// https://github.com/Krombik/keysender/blob/master/src/addon/mouse.cpp
+
 // code(core): def enum MouseButton
 // code(core): use napi(object) macro to label it
 // code(core): with Left,Right,Middle prop and value (0,1,2)
@@ -54,6 +64,11 @@ impl Mouse {
   #[napi]
   pub async fn press(button: MouseButton) -> Result<()> {
     let task = tokio::spawn(async move {
+      // mouse button -> mouse event flags down
+
+      // sophia::win::mouse::MouseButton::Left -> windows::Win32::UI::Input::KeyboardAndMouse
+      // sophia::win::mouse::MouseButton::Right -> windows::Win32::UI::Input::MOUSEEVENTF_RIGHTDOWN
+      // sophia::win::mouse::MouseButton::Middle -> windows::Win32::UI::Input::MOUSEEVENTF_MIDDLEDOWN
       let down = match button {
         MouseButton::Left => MOUSEEVENTF_LEFTDOWN,
         MouseButton::Right => MOUSEEVENTF_RIGHTDOWN,
@@ -74,6 +89,7 @@ impl Mouse {
   #[napi]
   pub async fn release(button: MouseButton) -> Result<()> {
     let task = tokio::spawn(async move {
+      // mouse button -> mouse event flags up
       let up = match button {
         MouseButton::Left => MOUSEEVENTF_LEFTUP,
         MouseButton::Right => MOUSEEVENTF_RIGHTUP,
@@ -94,12 +110,14 @@ impl Mouse {
   #[napi]
   pub async fn click(button: MouseButton, x: i32, y: i32) -> Result<()> {
     let task = tokio::spawn(async move {
+      // mouse button -> mouse event flags (down,up)
+
       let (down, up) = match button {
         MouseButton::Left => (MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP),
         MouseButton::Right => (MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP),
         MouseButton::Middle => (MOUSEEVENTF_MIDDLEDOWN, MOUSEEVENTF_MIDDLEUP),
       };
-
+      // move,doen,up
       mouse_move_inner(x, y);
       mouse_event(down, x, y, 0, 0);
       mouse_event(up, x, y, 0, 0);
@@ -126,7 +144,7 @@ impl Mouse {
 // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetCursorPos to get mouse position
 // code(core): use fn sophia::geometry::Point::new to make point and as result
 
-fn get_mouse_position_inner() -> Point {
+pub fn get_mouse_position_inner() -> Point {
   let mut position = windows::Win32::Foundation::POINT { x: 0, y: 0 };
   unsafe {
     let _ = GetCursorPos(&mut position);
@@ -141,7 +159,13 @@ fn get_mouse_position_inner() -> Point {
 // code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CYSCREEN
 // code(core): use fn windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics
 // code(core): use fn  windows::Win32::UI::Input::KeyboardAndMouse::mouse_event
-fn mouse_event(dw_flags: MOUSE_EVENT_FLAGS, dx: i32, dy: i32, dw_data: i32, dw_extra_info: usize) {
+pub fn mouse_event(
+  dw_flags: MOUSE_EVENT_FLAGS,
+  dx: i32,
+  dy: i32,
+  dw_data: i32,
+  dw_extra_info: usize,
+) {
   unsafe {
     let x = dx * 65536 / GetSystemMetrics(SM_CXSCREEN);
     let y = dy * 65536 / GetSystemMetrics(SM_CYSCREEN);
@@ -159,6 +183,6 @@ fn mouse_event(dw_flags: MOUSE_EVENT_FLAGS, dx: i32, dy: i32, dw_data: i32, dw_e
 // code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_MOVE
 // code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_ABSOLUTE
 
-fn mouse_move_inner(x: i32, y: i32) {
+pub fn mouse_move_inner(x: i32, y: i32) {
   mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, x, y, 0, 0);
 }

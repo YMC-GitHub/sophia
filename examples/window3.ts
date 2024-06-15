@@ -89,7 +89,13 @@ async function main() {
     let title = await window.getTitle()
     log(`[zero] window title:`, title)
 
-    let imgdata: ImageData
+    let className = await window.getClassName()
+    log(`[zero] window class name:`, className)
+
+    let pid = await window.getId()
+    log(`[zero] window pid:`, pid)
+
+    // let imgdata: ImageData
     let isopened = await window.isOpen()
     let isVisibled = await window.isVisible()
     let isMinimized = await window.isMinimized()
@@ -113,34 +119,37 @@ async function main() {
       // Promise.race()
     }
 
-    log(`[zero] window current rect:`)
-    rect = await window.getWindowRect()
-    log(jsonstro(rect))
+    // log(`[zero] window current rect:`)
+    // rect = await window.getWindowRect()
+    // log(jsonstro(rect))
 
-    log(`[zero] window capture view:`)
-    imgdata = await window.capture()
-    await saveImageData(`runtime-images-sync-window.png`, imgdata)
+    // log(`[zero] window capture view:`)
+    // imgdata = await window.capture()
+    // await saveImageData(`runtime-images-sync-window.png`, imgdata)
 
-    log(`[zero] window capture rect:`)
-    let { width, height } = getRect(rect)
-    imgdata = await window.captureArea(width / 2 - 50, height / 2 - 50, 100, 100)
-    await saveImageData(`runtime-images-sync-window-rect-01.png`, imgdata)
+    // log(`[zero] window capture rect:`)
+    // let { width, height } = getRect(rect)
+    // imgdata = await window.captureArea(width / 2 - 50, height / 2 - 50, 100, 100)
+    // await saveImageData(`runtime-images-sync-window-rect-01.png`, imgdata)
 
-    // // imgdata = await window.capture(rect.left + 0, rect.top + 0, rect.left + 100, rect.top + 100)
-    // // imgdata = await takeScreenshot(0, 0, screenSize.x, screenSize.y)
-    // // // writeFileSync(``,imgdata.data)
-    // // // msgLog(`[zero] demo: save image data:`);
-
-    // let view = getView(rect)
-    // log(view)
-
-    // // let { x, y, width, height } = view
-    // // imgdata = await takeScreenshot(x, y, width, height)
-    // let { left, top, right, bottom } = rect
-    // // imgdata = await takeScreenshot(left, top, right, bottom)
-    // imgdata = await window.capture(left, top, right, bottom)
-
-    // // imgdata = await window.capture(0, 0, rect.left + 100, rect.top + 100)
+    log(`[zero] window get mouse pos in window:`)
+    let pos = await window.getMousePos()
+    log(jsonstro(pos))
+    log(`[zero] window get by id:`)
+    let winx = await window.getWindowByPid(pid)
+    if (winx) {
+      let task4 = [winx].map(async (v) => {
+        return {
+          title: await v.getTitle(),
+          rect: await v.getWindowRect(),
+          id: await v.getId(),
+          className: await v.getClassName(),
+        }
+      })
+      let wins = await Promise.all(task4)
+      // log(jsonstro(wins))
+      log(wins)
+    }
   }
 }
 main()

@@ -5,6 +5,7 @@ const OFFSETS = [BigInt(0x48), BigInt(0x0), BigInt(0xf8), BigInt(0x18), BigInt(0
 
 async function main() {
   const processes = await getProcesses()
+  console.log(processes)
   const tutorial = processes.find((p) => p.name === 'Tutorial-x86_64.exe')
   if (!tutorial) {
     console.log('Tutorial-x86_64.exe not found')
