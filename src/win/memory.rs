@@ -805,6 +805,7 @@ pub async fn get_processes() -> Result<Vec<Process>> {
   let task = tokio::spawn(async move {
     let mut processes = Vec::new();
 
+    // 1. snapshot
     let snapshot = match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) } {
       Ok(snapshot) => snapshot,
       Err(err) => {
@@ -812,6 +813,7 @@ pub async fn get_processes() -> Result<Vec<Process>> {
       }
     };
 
+    // 2. process_entry
     let mut process_entry = PROCESSENTRY32W::default();
     process_entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
 
@@ -819,6 +821,7 @@ pub async fn get_processes() -> Result<Vec<Process>> {
       return Err(format!("Failed to get first process: {:?}", err));
     }
 
+    // 3. pid and name
     loop {
       let curr = decode_wide(&process_entry.szExeFile);
 

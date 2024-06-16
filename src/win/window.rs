@@ -2,9 +2,9 @@ use crate::geometry::{Point, Rect, WindowMetaInfo};
 use crate::screen::ImageData;
 use crate::utils::{encode_wide, handle_result};
 use crate::win::utils::{
-  close_window, get_mouse_position_in_window, get_window_class_name, get_window_meta_info,
-  get_window_pid, get_window_rect, get_window_title_next, is_foreground_window, is_minimize_window,
-  is_open_window, set_active_window, set_show_window, set_window_pos, show_window,
+  close_hwnd, get_hwnd_class_name, get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect,
+  get_hwnd_title_next, get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd,
+  is_open_hwnd, kill_hwnd, set_active_hwnd, set_hwnd_pos, set_show_hwnd, show_hwnd,
 };
 
 use napi::bindgen_prelude::*;
@@ -31,6 +31,47 @@ use std::ptr;
 
 // use win_screenshot::prelude::*;
 // use win_screenshot::capture::capture_window;
+
+async fn set_active_window(hwnd: HWND) -> Result<bool> {
+  // let hwnd = self.hwnd;
+  let task: tokio::task::JoinHandle<std::result::Result<bool, String>> =
+    tokio::spawn(async move { Ok(set_active_hwnd(hwnd)) });
+  handle_result(task).await
+}
+
+async fn set_window_pos(
+  hwnd: HWND,
+  x: i32,
+  y: i32,
+  width: i32,
+  height: i32,
+  flags: SET_WINDOW_POS_FLAGS,
+) -> Result<()> {
+  // let hwnd = self.hwnd;
+
+  let task = tokio::spawn(async move {
+    set_hwnd_pos(hwnd, x, y, width, height, flags);
+
+    Ok(())
+  });
+
+  handle_result(task).await
+}
+
+// code(core): def inner fn show_window
+// code(core): use fn tokio::spawn to make async task
+// code(core): use fn sophia::utils::handle_result to handle task
+// code(core): use const windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD
+// code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindow
+async fn show_window(hwnd: HWND, state: SHOW_WINDOW_CMD) -> Result<()> {
+  // let hwnd = self.hwnd;
+  let task = tokio::spawn(async move {
+    show_hwnd(hwnd, state);
+    Ok(())
+  });
+
+  handle_result(task).await
+}
 
 // use active_win_pos_rs::get_active_window;
 // code(core): def struct Window
@@ -78,7 +119,7 @@ impl Window {
   #[napi]
   pub async fn get_id(&self) -> Result<u32> {
     let hwnd = self.hwnd;
-    let task = tokio::spawn(async move { Ok(get_window_pid(hwnd)) });
+    let task = tokio::spawn(async move { Ok(get_hwnd_pid(hwnd)) });
     handle_result(task).await
   }
 
@@ -93,7 +134,7 @@ impl Window {
   #[napi]
   pub async fn get_title(&self) -> Result<String> {
     let hwnd = self.hwnd;
-    let task = tokio::spawn(async move { Ok(get_window_title_next(hwnd)) });
+    let task = tokio::spawn(async move { Ok(get_hwnd_title_next(hwnd)) });
     handle_result(task).await
   }
 
@@ -108,7 +149,7 @@ impl Window {
   pub async fn get_class_name(&self) -> Result<String> {
     let hwnd = self.hwnd;
 
-    let task = tokio::spawn(async move { Ok(get_window_class_name(hwnd)) });
+    let task = tokio::spawn(async move { Ok(get_hwnd_class_name(hwnd)) });
 
     handle_result(task).await
   }
@@ -127,7 +168,7 @@ impl Window {
   pub async fn get_window_rect(&self) -> Result<Rect> {
     let hwnd = self.hwnd;
 
-    let task = tokio::spawn(async move { Ok(get_window_rect(hwnd)) });
+    let task = tokio::spawn(async move { Ok(get_hwnd_rect(hwnd)) });
 
     handle_result(task).await
   }
@@ -145,7 +186,7 @@ impl Window {
   pub async fn get_window_meta_info(&self) -> Result<WindowMetaInfo> {
     let hwnd = self.hwnd;
 
-    let task = tokio::spawn(async move { Ok(get_window_meta_info(hwnd)) });
+    let task = tokio::spawn(async move { Ok(get_hwnd_meta_info(hwnd)) });
 
     handle_result(task).await
   }
@@ -157,7 +198,8 @@ impl Window {
 
   #[napi]
   pub async fn set_position(&self, x: i32, y: i32) -> Result<()> {
-    self.set_window_pos(x, y, 0, 0, SWP_NOSIZE).await
+    // self.set_window_pos(x, y, 0, 0, SWP_NOSIZE).await
+    set_window_pos(self.hwnd, x, y, 0, 0, SWP_NOSIZE).await
   }
 
   // code(core): impl struct Window with a method set_size
@@ -167,7 +209,8 @@ impl Window {
 
   #[napi]
   pub async fn set_size(&self, width: i32, height: i32) -> Result<()> {
-    self.set_window_pos(0, 0, width, height, SWP_NOMOVE).await
+    // self.set_window_pos(0, 0, width, height, SWP_NOMOVE).await
+    set_window_pos(self.hwnd, 0, 0, width, height, SWP_NOMOVE).await
   }
 
   // code(core): impl struct Window with a method is_foreground
@@ -179,7 +222,7 @@ impl Window {
   #[napi]
   pub async fn is_foreground(&self) -> Result<bool> {
     let hwnd = self.hwnd;
-    let task = tokio::spawn(async move { Ok(is_foreground_window(hwnd)) });
+    let task = tokio::spawn(async move { Ok(is_foreground_hwnd(hwnd)) });
     handle_result(task).await
   }
 
@@ -192,7 +235,8 @@ impl Window {
   // code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow
   #[napi]
   pub async fn foreground(&self) -> Result<bool> {
-    self.set_active_window().await
+    // self.set_active_window().await
+    set_active_window(self.hwnd).await
   }
 
   // code(core): impl struct Window with a method set_foreground
@@ -200,27 +244,20 @@ impl Window {
   // code(core): use fn tokio::spawn to make async task
   #[napi]
   pub async fn set_foreground(&self) -> Result<bool> {
-    self.set_active_window().await
+    // self.set_active_window().await
+    set_active_window(self.hwnd).await
   }
-
-  async fn set_active_window(&self) -> Result<bool> {
-    let hwnd = self.hwnd;
-    let task: tokio::task::JoinHandle<std::result::Result<bool, String>> =
-      tokio::spawn(async move { Ok(set_active_window(hwnd)) });
-    handle_result(task).await
-  }
-
   #[napi]
   pub async fn is_open(&self) -> Result<bool> {
     let hwnd = self.hwnd;
-    let task = tokio::spawn(async move { Ok(is_open_window(hwnd)) });
+    let task = tokio::spawn(async move { Ok(is_open_hwnd(hwnd)) });
 
     handle_result(task).await
   }
   #[napi]
   pub async fn is_minimized(&self) -> Result<bool> {
     let hwnd = self.hwnd;
-    let task = tokio::spawn(async move { Ok(is_minimize_window(hwnd)) });
+    let task = tokio::spawn(async move { Ok(is_minimize_hwnd(hwnd)) });
 
     handle_result(task).await
   }
@@ -234,7 +271,7 @@ impl Window {
   pub async fn show(&self) -> Result<bool> {
     let hwnd: HWND = self.hwnd;
     let task: tokio::task::JoinHandle<std::result::Result<bool, String>> =
-      tokio::spawn(async move { Ok(set_show_window(hwnd)) });
+      tokio::spawn(async move { Ok(set_show_hwnd(hwnd)) });
     handle_result(task).await
   }
 
@@ -244,7 +281,8 @@ impl Window {
   // code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE
   #[napi]
   pub async fn minimize(&self) -> Result<()> {
-    self.show_window(SW_MINIMIZE).await
+    // self.show_window(SW_MINIMIZE).await
+    show_window(self.hwnd, SW_MINIMIZE).await
   }
 
   // code(core): impl struct Window with a method maximize
@@ -253,21 +291,31 @@ impl Window {
   // code(core): use const windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE
   #[napi]
   pub async fn maximize(&self) -> Result<()> {
-    self.show_window(SW_MAXIMIZE).await
+    // self.show_window(SW_MAXIMIZE).await
+    show_window(self.hwnd, SW_MAXIMIZE).await
   }
 
   #[napi]
   pub async fn close(&self) -> Result<()> {
     let hwnd = self.hwnd;
     let task = tokio::spawn(async move {
-      close_window(hwnd);
+      close_hwnd(hwnd);
       Ok(())
     });
 
     handle_result(task).await
   }
 
-  // close_window
+  #[napi]
+  pub async fn kill(&self) -> Result<()> {
+    let hwnd = self.hwnd;
+    let task = tokio::spawn(async move {
+      kill_hwnd(hwnd);
+      Ok(())
+    });
+
+    handle_result(task).await
+  }
 
   #[napi]
   pub async fn is_visible(&self) -> Result<bool> {
@@ -277,44 +325,6 @@ impl Window {
         return Ok(false);
       }
       return Ok(true);
-    });
-
-    handle_result(task).await
-  }
-
-  // code(core): impl struct Window with a method inner fn show_window
-  // code(core): use fn tokio::spawn to make async task
-  // code(core): use fn sophia::utils::handle_result to handle task
-  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD
-  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::ShowWindow
-  async fn show_window(&self, state: SHOW_WINDOW_CMD) -> Result<()> {
-    let hwnd = self.hwnd;
-    let task = tokio::spawn(async move {
-      show_window(hwnd, state);
-      Ok(())
-    });
-
-    handle_result(task).await
-  }
-  // code(core): impl struct Window with a method inner fn set_window_pos
-  // code(core): use fn tokio::spawn to make async task
-  // code(core): use fn sophia::utils::handle_result to handle task
-  // code(core): use const windows::Win32::UI::WindowsAndMessaging::SET_WINDOW_POS_FLAGS
-  // code(core): use fn windows::Win32::UI::WindowsAndMessaging::SetWindowPos
-  async fn set_window_pos(
-    &self,
-    x: i32,
-    y: i32,
-    width: i32,
-    height: i32,
-    flags: SET_WINDOW_POS_FLAGS,
-  ) -> Result<()> {
-    let hwnd = self.hwnd;
-
-    let task = tokio::spawn(async move {
-      set_window_pos(hwnd, x, y, width, height, flags);
-
-      Ok(())
     });
 
     handle_result(task).await
@@ -388,9 +398,34 @@ impl Window {
 
   #[napi]
   pub async fn get_window_by_pid(&self, pid: u32) -> Result<Option<Window>> {
+    // todo: fix err when not this pid ?
+    // rust: Task join failed: JoinError::Panic(Id(156)
+    // node: triggerUncaughtException(err, true /* fromPromise */)
     get_window_by_pid(pid).await
   }
+  #[napi]
+  pub async fn get_active_window(&self) -> Result<Option<Window>> {
+    get_foreground_window().await
+  }
 
+  #[napi]
+  pub async fn get_window_by_title(&self, title: String) -> Result<Option<Window>> {
+    let task = tokio::spawn(async move {
+      let hwnd = unsafe { FindWindowW(None, PCWSTR(encode_wide(title).as_ptr())) };
+
+      if hwnd.0 == 0 {
+        Ok(None)
+      } else {
+        Ok(Some(Window { hwnd }))
+      }
+    });
+
+    handle_result(task).await
+  }
+  #[napi]
+  pub async fn get_window_by_class_name(classname: String) -> Result<Option<Window>> {
+    find_window_by_class_name(classname).await
+  }
   // ------------static-----------
   // code(core): impl struct Window with a method get_foreground_window as static fn
   // code(core): use napi macro to label it
@@ -497,13 +532,13 @@ impl Window {
 }
 
 // code(core): def fn get_hwnd_from_id
-pub const fn get_hwnd_from_id(id: isize) -> HWND {
+pub fn get_hwnd_from_id(id: isize) -> HWND {
   HWND(id)
 }
-// code(core): def fn get_hwnd_id
-pub const fn get_hwnd_id(hwnd: HWND) -> isize {
-  hwnd.0
-}
+// // -code(core): def fn get_hwnd_id
+// pub fn get_hwnd_id(hwnd: HWND) -> isize {
+//   hwnd.0
+// }
 // code(core): def fn is_valid_hwnd
 /// Checks if the window is a valid window with hwnd
 ///
@@ -547,23 +582,20 @@ unsafe extern "system" fn enum_hwnds_callback(hwnd: HWND, vec: LPARAM) -> BOOL {
   }
   TRUE
 }
-pub async fn list_hwnd() -> Result<Vec<HWND>> {
+pub fn list_hwnd() -> Vec<HWND> {
   // let hwnd = self.hwnd;
   let mut hwnds: Vec<HWND> = Vec::new();
 
-  let task = tokio::spawn(async move {
-    unsafe {
-      EnumChildWindows(
-        GetDesktopWindow(),
-        Some(enum_hwnds_callback),
-        LPARAM(ptr::addr_of_mut!(hwnds) as isize),
-      )
-    };
-
-    Ok(hwnds)
-  });
-  handle_result(task).await
+  unsafe {
+    EnumChildWindows(
+      GetDesktopWindow(),
+      Some(enum_hwnds_callback),
+      LPARAM(ptr::addr_of_mut!(hwnds) as isize),
+    )
+  };
+  hwnds
 }
+
 // list hwnd id
 // pub async fn list_hwnd_id() -> Result<Vec<isize>> {
 //   list_hwnd().await.iter().map(|x| get_hwnd_id(x)).collect()
@@ -602,7 +634,7 @@ pub fn get_window_by_pid_inner(pid: u32) -> Window {
   let windows = list_window_inner();
   let window: &Window = windows
     .iter()
-    .find(|i| get_window_pid(i.hwnd) == pid)
+    .find(|i| get_hwnd_pid(i.hwnd) == pid)
     .unwrap();
   Window { hwnd: window.hwnd }
 }

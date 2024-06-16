@@ -36,6 +36,24 @@ function jsonstro(json: any, trim: boolean = true) {
   }
   return text
 }
+
+async function getWindowState(window: Window) {
+  let open = await window.isOpen()
+  let visible = await window.isVisible()
+  let minimize = await window.isMinimized()
+  let foreground = await window.isForeground()
+
+  log(`[zero] window is open:`, open)
+  log(`[zero] window is isVisibled:`, visible)
+  log(`[zero] window is isMinimized:`, minimize)
+  log(`[zero] window is isForeground:`, foreground)
+  return {
+    open,
+    visible,
+    minimize,
+    foreground,
+  }
+}
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
@@ -96,17 +114,8 @@ async function main() {
     log(`[zero] window pid:`, pid)
 
     // let imgdata: ImageData
-    let isopened = await window.isOpen()
-    let isVisibled = await window.isVisible()
-    let isMinimized = await window.isMinimized()
-    let isForeground = await window.isForeground()
-
-    log(`[zero] window is open:`, isopened)
-    log(`[zero] window is isVisibled:`, isVisibled)
-    log(`[zero] window is isMinimized:`, isMinimized)
-    log(`[zero] window is isForeground:`, isForeground)
-
-    if (isMinimized) {
+    let winstate = await getWindowState(window)
+    if (winstate.minimize) {
       // log(`[zero] window set forground when window is isMinimized`)
       // let setfored = await window.setForeground()
       // log(`[zero] set foreground status`, setfored)
@@ -135,9 +144,19 @@ async function main() {
     log(`[zero] window get mouse pos in window:`)
     let pos = await window.getMousePos()
     log(jsonstro(pos))
-    log(`[zero] window get by id:`)
-    let winx = await window.getWindowByPid(pid)
 
+    log(`[zero] window get by id:`)
+    let winx: Window | null = null
+    try {
+      winx = await window.getWindowByPid(pid)
+      if (!winx) {
+        winx = await Window.fromContainsName(title)
+      }
+    } catch (error) {
+      // winx = await window.get(pid)
+    }
+
+    // called `Option::unwrap()` on a `None` value when not found
     if (winx) {
       log(`[zero] window get meta info when window found:`)
       let info = await winx.getWindowMetaInfo()
@@ -145,9 +164,20 @@ async function main() {
     }
 
     if (winx) {
+      // [zero] window is isVisibled: false
+      // [zero] window is isMinimized: false
+      // [zero] window is isForeground: false
       log(`[zero] window close:`)
-      await winx.close()
+      if (await winx.isVisible()) {
+        await winx.close()
+      }
+      let winstate = await getWindowState(window)
     }
+    // winx = await window.getWindowByPid(pid)
+    // if (winx) {
+    //   log(`[zero] window kill:`)
+    //   await winx.kill()
+    // }
   }
 }
 main()
