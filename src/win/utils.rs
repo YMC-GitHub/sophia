@@ -16,8 +16,8 @@ use windows::Win32::{
     GetForegroundWindow, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW,
     GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA,
     SetForegroundWindow, SetWindowPos, ShowWindow, ShowWindowAsync, GWL_EXSTYLE, GWL_STYLE,
-    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WS_CHILD,
-    WS_EX_TOOLWINDOW,
+    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WM_MOUSEMOVE,
+    WS_CHILD, WS_EX_TOOLWINDOW,
   },
 };
 // SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
@@ -509,7 +509,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 //  MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP,
 
 use windows::Win32::UI::WindowsAndMessaging::{
-  GetCursorPos, GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN,
+  GetCursorPos, GetSystemMetrics, PostMessageA, SM_CXSCREEN, SM_CYSCREEN,
 };
 
 // code(core): def inner fn get_mouse_position_in_screen to get mouse position
@@ -525,7 +525,42 @@ pub fn get_mouse_position_in_screen() -> Point {
 
   Point::new(position.x, position.y)
 }
+pub fn get_mouse_position_in_window(hwnd: HWND) -> Point {
+  // get mouse position in screen
+  let pos = get_mouse_position_in_screen();
+  // get window rect
+  let rect = get_hwnd_rect(hwnd);
+  // pos
+  Point {
+    x: pos.x - rect.left,
+    y: pos.y - rect.top,
+  }
+}
 
+pub fn coords_from_rect(rect: Rect) -> Point {
+  Point {
+    x: rect.left,
+    y: rect.top,
+  }
+}
+pub fn coords_from_screen_to_window(hwnd: HWND, coords: Point) -> Point {
+  // get mouse position in screen
+  // let pos = get_mouse_position_in_screen();
+  let rect = get_hwnd_rect(hwnd);
+  let posi = coords_from_rect(rect);
+
+  // pos
+  Point {
+    x: coords.x - posi.x,
+    y: coords.y - posi.x,
+  }
+}
+pub fn coords_move(base: Point, offset: Point) -> Point {
+  Point {
+    x: base.x + offset.x,
+    y: base.y + offset.y,
+  }
+}
 // code(core): def inner fn mouse_event to handle mouse envet
 // code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSE_EVENT_FLAGS
 // code(core): use const windows::Win32::UI::WindowsAndMessaging::SM_CXSCREEN
@@ -551,17 +586,6 @@ pub fn mouse_event(
     );
   }
 }
-pub fn get_mouse_position_in_window(hwnd: HWND) -> Point {
-  // get mouse position in screen
-  let pos = get_mouse_position_in_screen();
-  // get window rect
-  let rect = get_hwnd_rect(hwnd);
-  // pos
-  Point {
-    x: pos.x - rect.left,
-    y: pos.y - rect.top,
-  }
-}
 // code(core): def inner fn mouse_move_inner to move mouse
 // code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_MOVE
 // code(core): use const windows::Win32::UI::Input::KeyboardAndMouse::MOUSEEVENTF_ABSOLUTE
@@ -569,6 +593,49 @@ pub fn get_mouse_position_in_window(hwnd: HWND) -> Point {
 pub fn mouse_move_inner(x: i32, y: i32) {
   mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, x, y, 0, 0);
 }
+
+// [keysender's mouse in cpp](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/mouse.cpp)
+// Mouse::getMousePos need   mousePosGetter
+// Mouse::toggleMb need mbToggler
+// Mouse::scrollWheel need scrollWheeler
+// Mouse::move need mover
+
+// [keysender's mouse includ head in cpp](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/mouse.hpp)
+// use virtual::mousePosGetter as protected method
+// use virtual::mbToggler as protected method
+// use virtual::scrollWheeler as protected method
+// use virtual::mover as protected method
+
+// def Mouse::getMousePos as public method
+// def Mouse::toggleMb as public method
+// def Mouse::scrollWheel as public method
+// def Mouse::move need mover as public method
+
+// use includes.hpp as file head
+fn make_lparam(coords: Point) -> LPARAM {
+  let p = (coords.y << 16) | coords.x;
+  let lp = LPARAM(p as isize);
+  lp
+}
+
+pub fn mouse_move_in_window_inner(hwnd: HWND, coords: Point) -> () {
+  //   let message = unsafe{
+  //     SendMessageW(HWND(0x003E0AF4), WM_KEYDOWN,WPARAM(VK_RETURN.0 as usize), LPARAM(0));
+  //     SendMessageW(HWND(0x003E0AF4), WM_KEYUP,WPARAM(VK_RETURN.0 as usize), LPARAM(0))
+  // };
+
+  // MOUSEEVENTF_MOVE IN RUST, WM_MOUSEMOVE IN CPP ?
+  // PostMessageA ? SendMessageA ?
+  // WM_MOUSEMOVE vs MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE,
+  unsafe {
+    let _res = SendMessageA(hwnd, WM_MOUSEMOVE, WPARAM(1), make_lparam(coords));
+  }
+  // mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, x, y, 0, 0);
+  ()
+}
+// [the msg in SendMessageW rust ](https://rustcc.cn/article?id=514f4f9d-1e7d-45af-92f0-980c492a0d07)
+// [about SendMessage and mouse_event in cpp](https://blog.csdn.net/fuhanghang/article/details/118700752)
+// [WM_MOUSEMOVE in windows in rust](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/constant.WM_MOUSEMOVE.html)
 
 // Virtual.mouse
 // getPos

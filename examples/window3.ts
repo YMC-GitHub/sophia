@@ -1,4 +1,4 @@
-import { Window, getAllWindows, saveImageData, getScreenSize, takeScreenshot } from '../index'
+import { Window, getAllWindows, saveImageData, getScreenSize, takeScreenshot, Mouse } from '../index'
 import type { ImageData, Rect } from '../index'
 
 // constants
@@ -54,6 +54,39 @@ async function getWindowState(window: Window) {
     foreground,
   }
 }
+
+function randomInt(min: number, max: number) {
+  return Math.round(Math.random() * (max - min) + min)
+}
+
+// info mouse position in screen and window per 1s
+function infoMousePosition(window: Window | null) {
+  setInterval(async () => {
+    log(`[zero] mouse postion:`)
+    let flag = {
+      screen: await Mouse.getPosition(),
+      window: window ? await window.getMousePos() : {},
+    }
+    log(jsonstro(flag))
+  }, 1000)
+}
+
+// info mouse position in screen and window per 1s
+function moveMousePositionRand(window: Window | null) {
+  setInterval(async () => {
+    log(`[zero] move mouse random:`)
+    if (window) {
+      let { width, height } = await window.getWindowView()
+      let coords = {
+        x: randomInt(0, width),
+        y: randomInt(0, height),
+      }
+      log(`[zero] random coords:`, jsonstro(coords))
+      await window.mouseMove(coords, false)
+    }
+  }, 1000)
+}
+
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
@@ -182,6 +215,7 @@ async function main() {
       // }
       // if (!(await winx.isVisible())) {
       //   log(`[zero] window show:`)
+      //   await winx.setForeground()
       //   await winx.show()
       //   await sleep(1000)
       //   await getWindowState(winx)
@@ -201,18 +235,18 @@ async function main() {
       // }
 
       // minimize -> show: done
-      if (!(await winx.isMinimized())) {
-        log(`[zero] window minimize:`)
-        await winx.minimize()
-        await sleep(500)
-        await getWindowState(winx)
-      }
-      if (await winx.isMinimized()) {
-        log(`[zero] window show:`)
-        await winx.show()
-        await sleep(500)
-        await getWindowState(winx)
-      }
+      // if (!(await winx.isMinimized())) {
+      //   log(`[zero] window minimize:`)
+      //   await winx.minimize()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      // if (await winx.isMinimized()) {
+      //   log(`[zero] window show:`)
+      //   await winx.show()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
       // if (!(await winx.isForeground())) {
       //   log(`[zero] window set forground:`)
       //   await winx.setForeground()
@@ -231,6 +265,11 @@ async function main() {
     //   log(`[zero] window kill:`)
     //   await winx.kill()
     // }
+
+    if (winx) {
+      infoMousePosition(winx)
+      moveMousePositionRand(winx)
+    }
   }
 }
 main()

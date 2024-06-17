@@ -355,6 +355,7 @@ export class Window {
   close(): Promise<void>
   kill(): Promise<void>
   isVisible(): Promise<boolean>
+  mouseMove(coords: Point, isAbsolute: boolean): Promise<void>
   capture(): Promise<ImageData>
   captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

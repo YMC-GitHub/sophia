@@ -2,10 +2,10 @@ use crate::geometry::{Point, Rect, WindowMetaInfo, WindowView};
 use crate::screen::ImageData;
 use crate::utils::handle_result;
 use crate::win::utils::{
-  close_hwnd, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
+  close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
   get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next, get_hwnd_view,
   get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd, kill_hwnd,
-  list_hwnd, set_active_hwnd, set_hwnd_pos, show_hwnd,
+  list_hwnd, mouse_move_in_window_inner, set_active_hwnd, set_hwnd_pos, show_hwnd,
 };
 
 use napi::bindgen_prelude::*;
@@ -613,6 +613,12 @@ impl Window {
 
     handle_result(task).await
   }
+  // #[napi]
+  // pub async fn open(&self) -> Result<()> {
+  //   // self.show_window(SW_MINIMIZE).await
+  //   // about SW_SHOW SW_RESTORE,SW_SHOWDEFAULT
+  //   show_hwnd_async(self.hwnd, SW_SHOWDEFAULT).await
+  // }
 
   #[napi]
   pub async fn kill(&self) -> Result<()> {
@@ -633,6 +639,26 @@ impl Window {
         return Ok(false);
       }
       return Ok(true);
+    });
+
+    handle_result(task).await
+  }
+  //
+  #[napi]
+  pub async fn mouse_move(&self, coords: Point, is_absolute: bool) -> Result<()> {
+    let hwnd = self.hwnd;
+
+    let task = tokio::spawn(async move {
+      if is_absolute {
+        let last_coords = get_mouse_position_in_window(hwnd);
+        mouse_move_in_window_inner(hwnd, coords_move(last_coords, coords));
+        // need move mouse in screen ?
+        // ...
+      } else {
+        mouse_move_in_window_inner(hwnd, coords);
+      }
+
+      Ok(()) //return void in js
     });
 
     handle_result(task).await
