@@ -1,5 +1,5 @@
 // [get active window in rust](https://hellocode.co/blog/post/tracking-active-process-windows-rust/)
-use crate::geometry::{Rect, WindowMetaInfo};
+use crate::geometry::{Rect, WindowMetaInfo, WindowView};
 use crate::utils::{decode_wide, encode_wide};
 use std::path::{Path, PathBuf};
 use windows::core::{HSTRING, PCWSTR, PWSTR};
@@ -16,7 +16,8 @@ use windows::Win32::{
     GetForegroundWindow, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW,
     GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA,
     SetForegroundWindow, SetWindowPos, ShowWindow, ShowWindowAsync, GWL_EXSTYLE, GWL_STYLE,
-    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_SHOWNORMAL, WM_CLOSE, WS_CHILD, WS_EX_TOOLWINDOW,
+    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WS_CHILD,
+    WS_EX_TOOLWINDOW,
   },
 };
 // SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
@@ -246,10 +247,24 @@ pub fn get_hwnd_rect(hwnd: HWND) -> Rect {
   Rect::new(rect.left, rect.top, rect.right, rect.bottom)
 }
 
+/// hwnd -> windowview
+///
+/// data flow: HWND -> struct
+///
+pub fn get_hwnd_view(hwnd: HWND) -> WindowView {
+  let mut rect: windows::Win32::Foundation::RECT = windows::Win32::Foundation::RECT::default();
+  unsafe {
+    let _ = windows::Win32::UI::WindowsAndMessaging::GetWindowRect(hwnd, &mut rect);
+  };
+  let res = Rect::new(rect.left, rect.top, rect.right, rect.bottom);
+  WindowView::new(res.left, res.top, res.width, res.height)
+}
+
 /// hwnd -> meta-info
 ///
 /// data flow: HWND -> struct
 ///
+/// pid,rect,classname,title
 pub fn get_hwnd_meta_info(hwnd: HWND) -> WindowMetaInfo {
   let pid = get_hwnd_pid(hwnd);
   let rect = get_hwnd_rect(hwnd);
@@ -361,6 +376,7 @@ pub fn set_foreground_hwnd(hwnd: HWND) -> bool {
 /// with ShowWindowAsync
 ///
 pub fn set_show_hwnd(hwnd: HWND) -> bool {
+  // SW_SHOWNA vs SW_SHOWNORMAL vs SW_SHOWNOACTIVATE
   let res = unsafe { ShowWindowAsync(hwnd, SW_SHOWNORMAL) };
   res.0 != 0
 }
@@ -371,12 +387,28 @@ pub fn set_show_hwnd(hwnd: HWND) -> bool {
 // SendMessage ( hwnd, WM_CLOSE, NULL, NULL ) ;
 // https://github.com/microsoft/windows-rs/issues/1631
 
+// [about ShowWindow and PostMessage to hide window in cpp](https://bbs.csdn.net/topics/50006475)
+// [PostMessageW in rust](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/fn.PostMessageW.html)
+// [PostMessageA in rust](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/fn.PostMessageA.html)
+// [sendmessagea in cpp](https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-sendmessagea)
+// [showwindow in cpp](https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-showwindow)
 pub fn close_hwnd(hwnd: HWND) -> () {
   unsafe {
     SendMessageA(hwnd, WM_CLOSE, WPARAM(0), LPARAM(0));
   }
   ()
 }
+
+pub fn hide_hwnd(hwnd: HWND) -> () {
+  unsafe {
+    // hide hwnd with SendMessageA
+    // SendMessageA(hwnd, 0, WPARAM(0), LPARAM(0));
+    // hide hwnd with ShowWindowAsync
+    ShowWindowAsync(hwnd, SW_HIDE);
+  }
+  ()
+}
+
 /// kill window
 ///
 /// NOTE:

@@ -65,13 +65,16 @@ pub struct WindowView {
 }
 
 impl WindowView {
-  pub fn new(left: i32, top: i32, right: i32, bottom: i32) -> Self {
+  pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
     Self {
-      x: left,
-      y: top,
-      width: right,
-      height: bottom,
+      x,
+      y,
+      width,
+      height,
     }
+  }
+  pub fn default() -> Self {
+    Self::new(0, 0, 255, 255)
   }
 }
 

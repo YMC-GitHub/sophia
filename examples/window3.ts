@@ -1,4 +1,4 @@
-import { Window, getWindows, saveImageData, getScreenSize, takeScreenshot } from '../index'
+import { Window, getAllWindows, saveImageData, getScreenSize, takeScreenshot } from '../index'
 import type { ImageData, Rect } from '../index'
 
 // constants
@@ -57,7 +57,7 @@ async function getWindowState(window: Window) {
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
-  let windows = await getWindows()
+  let windows = await getAllWindows()
   // // info windows title
   // let task = windows.map(async (v) => await v.getTitle())
   // log(await Promise.all(task))
@@ -92,7 +92,7 @@ async function main() {
 
   // title = 'window3.ts - sophia - Visual Studio Code'
 
-  let window = await Window.fromContainsName(title)
+  let window = await Window.findWindowByTitle(title)
   // window = await Window.getForegroundWindow()
   // fromContainsName
   // window = await Window.findWindowByTitle('code')
@@ -148,9 +148,9 @@ async function main() {
     log(`[zero] window get by id:`)
     let winx: Window | null = null
     try {
-      winx = await window.getWindowByPid(pid)
+      winx = await window.fromPid(pid)
       if (!winx) {
-        winx = await Window.fromContainsName(title)
+        winx = await Window.findWindowBySubTitle(title)
       }
     } catch (error) {
       // winx = await window.get(pid)
@@ -167,11 +167,50 @@ async function main() {
       // [zero] window is isVisibled: false
       // [zero] window is isMinimized: false
       // [zero] window is isForeground: false
-      log(`[zero] window close:`)
-      if (await winx.isVisible()) {
-        await winx.close()
+      // if (!(await winx.isForeground())) {
+      //   log(`[zero] window set forground:`)
+      //   await winx.setForeground()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      // close -> show : fail
+      // if (await winx.isVisible()) {
+      //   log(`[zero] window close:`)
+      //   await winx.close()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      // if (!(await winx.isVisible())) {
+      //   log(`[zero] window show:`)
+      //   await winx.show()
+      //   await sleep(1000)
+      //   await getWindowState(winx)
+      // }
+      // minimize -> show: done
+      // if (!(await winx.isMinimized())) {
+      //   log(`[zero] window minimize:`)
+      //   await winx.minimize()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      if (await winx.isMinimized()) {
+        log(`[zero] window show:`)
+        await winx.show()
+        await sleep(500)
+        await getWindowState(winx)
       }
-      let winstate = await getWindowState(window)
+      // if (await winx.isMinimized()) {
+      //   log(`[zero] window maximize:`)
+      //   await winx.maximize()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      // if (!(await winx.isForeground())) {
+      //   log(`[zero] window set forground:`)
+      //   await winx.setForeground()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
     }
     // winx = await window.getWindowByPid(pid)
     // if (winx) {

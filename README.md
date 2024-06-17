@@ -157,3 +157,7 @@ I'm a big fan of [AutoHotkey](https://www.autohotkey.com/), but I want to use it
 ## License
 
 Sophia is licensed under the MIT License. Feel free to use it in your projects, adhering to the license terms.
+
+## Todo
+
+- ~~init impl in an init fn like [dimusic/active-win-pos-rs 's init_platform_api](https://github.com/dimusic/active-win-pos-rs/blob/main/src/win/mod.rs)~~

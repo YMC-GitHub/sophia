@@ -310,7 +310,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { fib, ImageData, MAGENTA, readImageData, saveImageData, imageSearch, multipleImageSearch, Modifiers, Key, Keyboard, ProcessAccess, OpenedProcess, openProcess, getProcesses, MouseButton, Mouse, getScreenSize, takeScreenshot, Window, listWindow, getWindows, getWindowByPid, getWindowByName, fromContainsName, getWindowContainsTitle, findWindowByClassName, getForegroundWindow } = nativeBinding
+const { fib, ImageData, MAGENTA, readImageData, saveImageData, imageSearch, multipleImageSearch, Modifiers, Key, Keyboard, ProcessAccess, OpenedProcess, openProcess, getProcesses, MouseButton, Mouse, getScreenSize, takeScreenshot, Window, listWindow, getAllWindows, getForegroundWindow, findWindowByPid, findWindowByTitle, findWindowByClassName, findWindowContainsTitle, findWindowContainsClassName } = nativeBinding
 
 module.exports.fib = fib
 module.exports.ImageData = ImageData
@@ -332,10 +332,10 @@ module.exports.getScreenSize = getScreenSize
 module.exports.takeScreenshot = takeScreenshot
 module.exports.Window = Window
 module.exports.listWindow = listWindow
-module.exports.getWindows = getWindows
-module.exports.getWindowByPid = getWindowByPid
-module.exports.getWindowByName = getWindowByName
-module.exports.fromContainsName = fromContainsName
-module.exports.getWindowContainsTitle = getWindowContainsTitle
-module.exports.findWindowByClassName = findWindowByClassName
+module.exports.getAllWindows = getAllWindows
 module.exports.getForegroundWindow = getForegroundWindow
+module.exports.findWindowByPid = findWindowByPid
+module.exports.findWindowByTitle = findWindowByTitle
+module.exports.findWindowByClassName = findWindowByClassName
+module.exports.findWindowContainsTitle = findWindowContainsTitle
+module.exports.findWindowContainsClassName = findWindowContainsClassName
