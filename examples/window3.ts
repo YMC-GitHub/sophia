@@ -187,49 +187,44 @@ async function main() {
       //   await getWindowState(winx)
       // }
       // hide -> show :
-      if (await winx.isVisible()) {
-        log(`[zero] window close:`)
-        await winx.hide()
+      // if (await winx.isVisible()) {
+      //   log(`[zero] window close:`)
+      //   await winx.hide()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
+      // if (!(await winx.isVisible())) {
+      //   log(`[zero] window show:`)
+      //   await winx.show()
+      //   await sleep(1000)
+      //   await getWindowState(winx)
+      // }
+
+      // minimize -> show: done
+      if (!(await winx.isMinimized())) {
+        log(`[zero] window minimize:`)
+        await winx.minimize()
         await sleep(500)
         await getWindowState(winx)
       }
-      if (!(await winx.isVisible())) {
+      if (await winx.isMinimized()) {
         log(`[zero] window show:`)
         await winx.show()
-        await sleep(1000)
+        await sleep(500)
         await getWindowState(winx)
       }
-      log(`[zero] window capture:`)
-      imgdata = await winx.capture()
-      let loc: string = `./runtime-images-sync-window.png`
-      log(`[zero] ${loc}:`)
-      await saveImageData(loc, imgdata)
-
-      // minimize -> show: done
-      // if (!(await winx.isMinimized())) {
-      //   log(`[zero] window minimize:`)
-      //   await winx.minimize()
-      //   await sleep(500)
-      //   await getWindowState(winx)
-      // }
-      // if (await winx.isMinimized()) {
-      //   log(`[zero] window show:`)
-      //   await winx.show()
-      //   await sleep(500)
-      //   await getWindowState(winx)
-      // }
-      // if (await winx.isMinimized()) {
-      //   log(`[zero] window maximize:`)
-      //   await winx.maximize()
-      //   await sleep(500)
-      //   await getWindowState(winx)
-      // }
       // if (!(await winx.isForeground())) {
       //   log(`[zero] window set forground:`)
       //   await winx.setForeground()
       //   await sleep(500)
       //   await getWindowState(winx)
       // }
+
+      log(`[zero] window capture:`)
+      imgdata = await winx.capture()
+      let loc: string = `./runtime-images-sync-window.png`
+      log(`[zero] ${loc}:`)
+      await saveImageData(loc, imgdata)
     }
     // winx = await window.getWindowByPid(pid)
     // if (winx) {
