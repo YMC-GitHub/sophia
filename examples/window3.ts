@@ -87,6 +87,25 @@ function moveMousePositionRand(window: Window | null) {
   }, 1000)
 }
 
+function moveMousePositionInMenuRect(window: Window | null) {
+  setInterval(async () => {
+    log(`[zero] move mouse in menu rect:`)
+    if (window) {
+      // let { width, height } = await window.getWindowView()
+      let coords = {
+        x: randomInt(10, 253),
+        y: randomInt(39, 757),
+      }
+      log(`[zero] random coords:`, jsonstro(coords))
+      await window.mouseMove(coords, false)
+      await window.mouseToggler(coords, 'left', false)
+      await sleep(50)
+      await window.mouseToggler(coords, 'left', true)
+      await sleep(50)
+    }
+  }, 1000)
+}
+
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
@@ -268,7 +287,8 @@ async function main() {
 
     if (winx) {
       infoMousePosition(winx)
-      moveMousePositionRand(winx)
+      // moveMousePositionRand(winx)
+      moveMousePositionInMenuRect(winx)
     }
   }
 }

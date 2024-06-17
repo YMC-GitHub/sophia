@@ -1,6 +1,7 @@
 // [get active window in rust](https://hellocode.co/blog/post/tracking-active-process-windows-rust/)
 use crate::geometry::{Rect, WindowMetaInfo, WindowView};
 use crate::utils::{decode_wide, encode_wide};
+
 use std::path::{Path, PathBuf};
 use windows::core::{HSTRING, PCWSTR, PWSTR};
 // https://docs.rs/windows-sys/latest/windows_sys/Win32/Storage/FileSystem/index.html
@@ -11,13 +12,15 @@ use windows::Win32::System::Threading::{
 };
 use windows::Win32::{
   Foundation::{CloseHandle, BOOL, HANDLE, HWND, LPARAM, MAX_PATH, RECT, TRUE, WPARAM},
+  UI::Input::KeyboardAndMouse::{VK_LBUTTON, VK_MBUTTON, VK_RBUTTON, VK_XBUTTON1, VK_XBUTTON2},
   UI::WindowsAndMessaging::{
     EnumChildWindows, FindWindowW, GetClassNameW, GetClientRect, GetDesktopWindow,
     GetForegroundWindow, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW,
     GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA,
     SetForegroundWindow, SetWindowPos, ShowWindow, ShowWindowAsync, GWL_EXSTYLE, GWL_STYLE,
-    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WM_MOUSEMOVE,
-    WS_CHILD, WS_EX_TOOLWINDOW,
+    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WM_KEYDOWN,
+    WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE, WM_RBUTTONDOWN,
+    WM_RBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WS_CHILD, WS_EX_TOOLWINDOW,
   },
 };
 // SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
@@ -502,7 +505,7 @@ pub fn get_process_path(process_id: u32) -> Result<PathBuf, ()> {
 
 use crate::geometry::Point;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-  MOUSEEVENTF_ABSOLUTE, MOUSEEVENTF_MOVE, MOUSE_EVENT_FLAGS,
+  MOUSEEVENTF_ABSOLUTE, MOUSEEVENTF_MOVE, MOUSE_EVENT_FLAGS, VIRTUAL_KEY,
 };
 //  MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, MOUSEEVENTF_MIDDLEDOWN,
 // MOUSEEVENTF_MIDDLEUP,
@@ -636,6 +639,106 @@ pub fn mouse_move_in_window_inner(hwnd: HWND, coords: Point) -> () {
 // [the msg in SendMessageW rust ](https://rustcc.cn/article?id=514f4f9d-1e7d-45af-92f0-980c492a0d07)
 // [about SendMessage and mouse_event in cpp](https://blog.csdn.net/fuhanghang/article/details/118700752)
 // [WM_MOUSEMOVE in windows in rust](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/constant.WM_MOUSEMOVE.html)
+
+// pub enum MouseButtonWparams {
+//   Left = WM_KEYDOWN,
+//   Right,
+//   Middle,
+// }
+
+// PostMessageA(hWnd, Helper::mouseEvents.at(button)[(int)isButtonDown], isButtonDown ? wParams.at(button) : 0, MAKELPARAM(lastCoords.x, lastCoords.y));
+
+// 1. define mouse events hash-map stage 1
+// [mouse events in cpp in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/helper.cpp)
+use std::collections::HashMap;
+pub fn mouse_events() -> HashMap<String, [u32; 2]> {
+  let teams_list = vec![
+    ("left".to_string(), [WM_LBUTTONUP, WM_LBUTTONDOWN]),
+    ("right".to_string(), [WM_RBUTTONUP, WM_RBUTTONDOWN]),
+    ("middle".to_string(), [WM_MBUTTONUP, WM_MBUTTONDOWN]),
+    ("x1".to_string(), [WM_XBUTTONUP, WM_XBUTTONDOWN]),
+    ("x2".to_string(), [WM_XBUTTONUP, WM_XBUTTONDOWN]),
+  ];
+
+  let teams_map: HashMap<_, _> = teams_list.into_iter().collect();
+
+  teams_map
+  // println!("{:?}", teams_map)
+}
+// [mouse events in rust in windows](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/Input/KeyboardAndMouse/index.html)
+
+// 2. define mouse events hash-map stage 2
+// [define const vars in rust with lazy_static](https://blog.csdn.net/u013623958/article/details/123082922)
+use lazy_static::lazy_static;
+lazy_static! {
+  pub static ref MOUSE_EVENTS: HashMap<String, [u32; 2]> = {
+    let events = mouse_events();
+    events
+  };
+}
+
+pub fn mouse_get_event(event: String) -> [u32; 2] {
+  let res = MOUSE_EVENTS
+    .get(&event)
+    .copied()
+    .unwrap_or([WM_LBUTTONUP, WM_LBUTTONDOWN]);
+  res
+}
+
+pub fn mouse_get_event_msg(button: String, is_button_down: bool) -> u32 {
+  mouse_get_event(button)[if is_button_down { 1 } else { 0 }]
+}
+
+//
+
+// [mouse buttons in cpp in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/helper.cpp#L132)
+// [mouse buttons in rust in windows](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/Input/KeyboardAndMouse/index.html)
+pub fn mouse_buttons() -> HashMap<String, VIRTUAL_KEY> {
+  let teams_list = vec![
+    ("left".to_string(), VK_LBUTTON),
+    ("right".to_string(), VK_RBUTTON),
+    ("middle".to_string(), VK_MBUTTON),
+    ("x1".to_string(), VK_XBUTTON1),
+    ("x2".to_string(), VK_XBUTTON2),
+  ];
+
+  let teams_map: HashMap<_, _> = teams_list.into_iter().collect();
+  teams_map
+}
+// VK_LBUTTON,VK_RBUTTON,VK_MBUTTON,VK_XBUTTON1,VK_XBUTTON2
+lazy_static! {
+  pub static ref MOUSE_BUTTONS: HashMap<String, VIRTUAL_KEY> = {
+    let buttons = mouse_buttons();
+    buttons
+  };
+}
+
+pub fn mouse_get_button(button: String) -> VIRTUAL_KEY {
+  let res = MOUSE_BUTTONS.get(&button).copied().unwrap_or(VK_LBUTTON);
+  res
+}
+
+pub fn mouse_toggler_in_window_inner(
+  hwnd: HWND,
+  coords: Point,
+  button: String,
+  is_button_down: bool,
+) -> () {
+  // WM_LBUTTONDOWN
+  //
+  unsafe {
+    let _res = SendMessageA(
+      hwnd,
+      mouse_get_event_msg(button, is_button_down),
+      WPARAM(0),
+      make_lparam(coords),
+    );
+  }
+  // use  WPARAM(0) ? use mouse_get_button(button)?
+  // [use  WPARAM(0) in this demo](https://blog.csdn.net/fuhanghang/article/details/118700752)
+  // [use mouse_get_button(button) in this demo](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/virtual.cpp#L26)
+  ()
+}
 
 // Virtual.mouse
 // getPos
