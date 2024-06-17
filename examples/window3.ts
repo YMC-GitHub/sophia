@@ -113,7 +113,7 @@ async function main() {
     let pid = await window.getId()
     log(`[zero] window pid:`, pid)
 
-    // let imgdata: ImageData
+    let imgdata: ImageData
     let winstate = await getWindowState(window)
     if (winstate.minimize) {
       // log(`[zero] window set forground when window is isMinimized`)
@@ -186,6 +186,25 @@ async function main() {
       //   await sleep(1000)
       //   await getWindowState(winx)
       // }
+      // hide -> show :
+      if (await winx.isVisible()) {
+        log(`[zero] window close:`)
+        await winx.hide()
+        await sleep(500)
+        await getWindowState(winx)
+      }
+      if (!(await winx.isVisible())) {
+        log(`[zero] window show:`)
+        await winx.show()
+        await sleep(1000)
+        await getWindowState(winx)
+      }
+      log(`[zero] window capture:`)
+      imgdata = await winx.capture()
+      let loc: string = `./runtime-images-sync-window.png`
+      log(`[zero] ${loc}:`)
+      await saveImageData(loc, imgdata)
+
       // minimize -> show: done
       // if (!(await winx.isMinimized())) {
       //   log(`[zero] window minimize:`)
@@ -193,12 +212,12 @@ async function main() {
       //   await sleep(500)
       //   await getWindowState(winx)
       // }
-      if (await winx.isMinimized()) {
-        log(`[zero] window show:`)
-        await winx.show()
-        await sleep(500)
-        await getWindowState(winx)
-      }
+      // if (await winx.isMinimized()) {
+      //   log(`[zero] window show:`)
+      //   await winx.show()
+      //   await sleep(500)
+      //   await getWindowState(winx)
+      // }
       // if (await winx.isMinimized()) {
       //   log(`[zero] window maximize:`)
       //   await winx.maximize()
