@@ -193,12 +193,12 @@ async function main() {
         await sleep(500)
         await getWindowState(winx)
       }
-      if (!(await winx.isVisible())) {
-        log(`[zero] window show:`)
-        await winx.show()
-        await sleep(1000)
-        await getWindowState(winx)
-      }
+      // if (!(await winx.isVisible())) {
+      //   log(`[zero] window show:`)
+      //   await winx.show()
+      //   await sleep(1000)
+      //   await getWindowState(winx)
+      // }
       log(`[zero] window capture:`)
       imgdata = await winx.capture()
       let loc: string = `./runtime-images-sync-window.png`
