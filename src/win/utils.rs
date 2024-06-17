@@ -620,7 +620,7 @@ fn make_lparam(coords: Point) -> LPARAM {
   let lp = LPARAM(p as isize);
   lp
 }
-
+///in keysender using  PostMessageA , here using SendMessageA
 pub fn mouse_move_in_window_inner(hwnd: HWND, coords: Point) -> () {
   //   let message = unsafe{
   //     SendMessageW(HWND(0x003E0AF4), WM_KEYDOWN,WPARAM(VK_RETURN.0 as usize), LPARAM(0));
@@ -636,17 +636,10 @@ pub fn mouse_move_in_window_inner(hwnd: HWND, coords: Point) -> () {
   // mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, x, y, 0, 0);
   ()
 }
-// [the msg in SendMessageW rust ](https://rustcc.cn/article?id=514f4f9d-1e7d-45af-92f0-980c492a0d07)
+
+// [the msg in SendMessageW rust](https://rustcc.cn/article?id=514f4f9d-1e7d-45af-92f0-980c492a0d07)
 // [about SendMessage and mouse_event in cpp](https://blog.csdn.net/fuhanghang/article/details/118700752)
 // [WM_MOUSEMOVE in windows in rust](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/constant.WM_MOUSEMOVE.html)
-
-// pub enum MouseButtonWparams {
-//   Left = WM_KEYDOWN,
-//   Right,
-//   Middle,
-// }
-
-// PostMessageA(hWnd, Helper::mouseEvents.at(button)[(int)isButtonDown], isButtonDown ? wParams.at(button) : 0, MAKELPARAM(lastCoords.x, lastCoords.y));
 
 // 1. define mouse events hash-map stage 1
 // [mouse events in cpp in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/helper.cpp)
@@ -718,14 +711,13 @@ pub fn mouse_get_button(button: String) -> VIRTUAL_KEY {
   res
 }
 
-pub fn mouse_toggler_in_window_inner(
+///in keysender using  PostMessageA , here using SendMessageA
+pub fn mouse_toggle_in_window_inner(
   hwnd: HWND,
   coords: Point,
   button: String,
   is_button_down: bool,
 ) -> () {
-  // WM_LBUTTONDOWN
-  //
   unsafe {
     let _res = SendMessageA(
       hwnd,
@@ -735,7 +727,7 @@ pub fn mouse_toggler_in_window_inner(
     );
   }
   // use  WPARAM(0) ? use mouse_get_button(button)?
-  // [use  WPARAM(0) in this demo](https://blog.csdn.net/fuhanghang/article/details/118700752)
+  // [use WPARAM(0) in this demo](https://blog.csdn.net/fuhanghang/article/details/118700752)
   // [use mouse_get_button(button) in this demo](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/virtual.cpp#L26)
   ()
 }

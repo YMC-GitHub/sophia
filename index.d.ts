@@ -356,7 +356,7 @@ export class Window {
   kill(): Promise<void>
   isVisible(): Promise<boolean>
   mouseMove(coords: Point, isAbsolute: boolean): Promise<void>
-  mouseToggler(coords: Point, button: string, isButtonDown: boolean): Promise<void>
+  mouseToggle(coords: Point, button: string, isButtonDown: boolean): Promise<void>
   capture(): Promise<ImageData>
   captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

@@ -98,9 +98,9 @@ function moveMousePositionInMenuRect(window: Window | null) {
       }
       log(`[zero] random coords:`, jsonstro(coords))
       await window.mouseMove(coords, false)
-      await window.mouseToggler(coords, 'left', false)
+      await window.mouseToggle(coords, 'left', false)
       await sleep(50)
-      await window.mouseToggler(coords, 'left', true)
+      await window.mouseToggle(coords, 'left', true)
       await sleep(50)
     }
   }, 1000)

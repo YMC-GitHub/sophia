@@ -5,7 +5,7 @@ use crate::win::utils::{
   close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
   get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next, get_hwnd_view,
   get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd, kill_hwnd,
-  list_hwnd, mouse_move_in_window_inner, mouse_toggler_in_window_inner, set_active_hwnd,
+  list_hwnd, mouse_move_in_window_inner, mouse_toggle_in_window_inner, set_active_hwnd,
   set_hwnd_pos, show_hwnd,
 };
 
@@ -667,7 +667,7 @@ impl Window {
   }
   // mouse_toggler_in_window_inner
   #[napi]
-  pub async fn mouse_toggler(
+  pub async fn mouse_toggle(
     &self,
     coords: Point,
     button: String,
@@ -676,7 +676,7 @@ impl Window {
     let hwnd = self.hwnd;
 
     let task = tokio::spawn(async move {
-      mouse_toggler_in_window_inner(hwnd, coords, button, is_button_down);
+      mouse_toggle_in_window_inner(hwnd, coords, button, is_button_down);
 
       Ok(()) //return void in js
     });
