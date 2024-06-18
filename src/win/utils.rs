@@ -18,12 +18,14 @@ use windows::Win32::{
     GetForegroundWindow, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW,
     GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA,
     SetForegroundWindow, SetWindowPos, ShowWindow, ShowWindowAsync, GWL_EXSTYLE, GWL_STYLE,
-    SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CLOSE, WM_KEYDOWN,
-    WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE, WM_RBUTTONDOWN,
-    WM_RBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WS_CHILD, WS_EX_TOOLWINDOW,
+    SB_LINEDOWN, SB_LINEUP, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL,
+    WM_CLOSE, WM_KEYDOWN, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE,
+    WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_VSCROLL, WM_XBUTTONDOWN, WM_XBUTTONUP,
+    WS_CHILD, WS_EX_TOOLWINDOW,
   },
 };
 // SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
+// https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/constant.WM_MOUSEWHEEL.html?search=MK_MBUTTON
 
 use windows::Win32::System::Threading::GetCurrentProcessId;
 
@@ -620,6 +622,12 @@ fn make_lparam(coords: Point) -> LPARAM {
   let lp = LPARAM(p as isize);
   lp
 }
+fn make_wparam(coords: Point) -> WPARAM {
+  let p = (coords.y << 16) | coords.x;
+  let lp = WPARAM(p as usize);
+  lp
+}
+
 ///in keysender using  PostMessageA , here using SendMessageA
 pub fn mouse_move_in_window_inner(hwnd: HWND, coords: Point) -> () {
   //   let message = unsafe{
@@ -718,6 +726,9 @@ pub fn mouse_toggle_in_window_inner(
   button: String,
   is_button_down: bool,
 ) -> () {
+  // unsafe {
+  //   let _res = SendMessageA(hwnd, WM_MOUSEWHEEL, WPARAM(0), make_lparam(coords));
+  // }
   unsafe {
     let _res = SendMessageA(
       hwnd,
@@ -731,6 +742,72 @@ pub fn mouse_toggle_in_window_inner(
   // [use mouse_get_button(button) in this demo](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/virtual.cpp#L26)
   ()
 }
+
+fn get_direction(is_up: bool) -> usize {
+  if is_up {
+    0
+  } else {
+    1
+  }
+}
+///
+/// NOTE
+///
+/// use last-coords in keysender, here pass coords.
+pub fn mouse_wheel_scroll_in_window_inner(hwnd: HWND, coords: Point, is_up: bool) -> () {
+  // let mut wcoord = Point {
+  //   x: 0,
+  //   y: coords.x * 120,
+  // };
+  // // wcoord.y = get_direction()
+  // wcoord.y = 120;
+  unsafe {
+    let _res = SendMessageA(
+      hwnd,
+      WM_MOUSEWHEEL,
+      WPARAM(get_direction(is_up)),
+      make_lparam(coords),
+    );
+  }
+  // WN_VSCROLL,SB_LINEUP,SB_LINEDOWN,SB_LINELEFT,SB_LINERIGHT
+  //
+  // unsafe {
+  //   // SB_LINEUP =  0i32 -> WPARAM(0)
+  //   // SB_LINEDOWN = 1i32 -> WPARAM(1)
+  //   // SB_LINELEFT =  0i32 -> WPARAM(0)
+  //   // SB_LINERIGHT = 1i32 -> WPARAM(1)
+  //   let _res = SendMessageA(
+  //     hwnd,
+  //     WM_VSCROLL,
+  //     WPARAM(get_direction(is_up)),
+  //     make_lparam(coords),
+  //   );
+  // }
+
+  //  SendMessageA(hWnd, WM_MOUSEWHEEL, MAKEWPARAM(x, MK_MBUTTON), MAKELPARAM(lastCoords.x, lastCoords.y));
+  // SendMessageA(hWnd, WM_MOUSEWHEEL, MAKEWPARAM(0, x*120), MAKELPARAM(lastCoords.x, lastCoords.y))
+  ()
+}
+// [makewparam in cpp](https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-makewparam)
+// [wm-mousewheel in cpp in windows](https://learn.microsoft.com/zh-cn/windows/win32/inputdev/wm-mousewheel)
+// [PostMessage and WM_MOUSEWHEEL Description of simulated wheel events in cpp](https://blog.csdn.net/u013394556/article/details/97026505)
+// SPY++ Tool for Windows Motion Capture ?
+// [scrollWheel doesn't work in cpp in keysender](https://github.com/Krombik/keysender/issues/25)
+// [PostMessage and WM_MOUSEWHEEL](https://forums.codeguru.com/showthread.php?509919-WM_MOUSEWHEEL-messages-never-arrive-Why)
+// [SB_LINEUP](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/Foundation/struct.WPARAM.html?search=SB_LINEUP)
+// [WHEEL_DELTA in rust in window](https://microsoft.github.io/windows-docs-rs/doc/windows/Win32/UI/WindowsAndMessaging/constant.WHEEL_DELTA.html)
+
+// mouse click
+// mouse move
+// mouse move to
+// mouse human move to
+// mouse get pos
+// mouse
+// scroll wheel
+// [using addon api in ts in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/worker.ts)
+
+// [get delta from LPARAM in rust in emrebicer/mouce](https://github.com/emrebicer/mouce/blob/master/src/windows.rs#L268)
+// [get point from LPARAM in rust in emrebicer/mouce](https://github.com/emrebicer/mouce/blob/master/src/windows.rs#L263)
 
 // Virtual.mouse
 // getPos

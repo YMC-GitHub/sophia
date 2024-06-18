@@ -106,6 +106,47 @@ function moveMousePositionInMenuRect(window: Window | null) {
   }, 1000)
 }
 
+function scrollMouseWheeInScrollRect(window: Window | null) {
+  setInterval(async () => {
+    log(`[zero] scroll mouse in scroll rect:`)
+    if (window) {
+      let { width, height } = await window.getWindowView()
+      let coords = {
+        x: Math.round(width / 2),
+        y: Math.round(height / 2),
+      }
+      coords = {
+        x: 1279,
+        y: 473,
+      }
+      let up = randomInt(0, 10) >= 5 ? true : false
+      log(`[zero] random direction:`, up ? 'up' : 'down')
+      coords = up
+        ? {
+            x: 1279,
+            y: 201,
+          }
+        : {
+            x: 1279,
+            y: 841,
+          }
+
+      log(`[zero] random coords:`, jsonstro(coords))
+      await window.mouseMove(coords, false)
+
+      // click up or down at coord to mock scroll whell
+      // // press left
+      // await window.mouseToggle(coords, 'left', false)
+      // await sleep(50)
+      // // release left
+      // await window.mouseToggle(coords, 'left', true)
+      // await sleep(50)
+
+      await window.mouseWheelScroll(coords, up)
+    }
+  }, 1000)
+}
+
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
@@ -286,9 +327,10 @@ async function main() {
     // }
 
     if (winx) {
-      infoMousePosition(winx)
+      // infoMousePosition(winx)
       // moveMousePositionRand(winx)
-      moveMousePositionInMenuRect(winx)
+      // moveMousePositionInMenuRect(winx)
+      scrollMouseWheeInScrollRect(winx)
     }
   }
 }

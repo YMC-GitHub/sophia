@@ -5,8 +5,8 @@ use crate::win::utils::{
   close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
   get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next, get_hwnd_view,
   get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd, kill_hwnd,
-  list_hwnd, mouse_move_in_window_inner, mouse_toggle_in_window_inner, set_active_hwnd,
-  set_hwnd_pos, show_hwnd,
+  list_hwnd, mouse_move_in_window_inner, mouse_toggle_in_window_inner,
+  mouse_wheel_scroll_in_window_inner, set_active_hwnd, set_hwnd_pos, show_hwnd,
 };
 
 use napi::bindgen_prelude::*;
@@ -677,6 +677,19 @@ impl Window {
 
     let task = tokio::spawn(async move {
       mouse_toggle_in_window_inner(hwnd, coords, button, is_button_down);
+
+      Ok(()) //return void in js
+    });
+
+    handle_result(task).await
+  }
+
+  #[napi]
+  pub async fn mouse_wheel_scroll(&self, coords: Point, is_up: bool) -> Result<()> {
+    let hwnd = self.hwnd;
+
+    let task = tokio::spawn(async move {
+      mouse_wheel_scroll_in_window_inner(hwnd, coords, is_up);
 
       Ok(()) //return void in js
     });
