@@ -358,6 +358,7 @@ export class Window {
   mouseMove(coords: Point, isAbsolute: boolean): Promise<void>
   mouseToggle(coords: Point, button: string, isButtonDown: boolean): Promise<void>
   mouseWheelScroll(coords: Point, isUp: boolean): Promise<void>
+  typing(text: string): Promise<void>
   capture(): Promise<ImageData>
   captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

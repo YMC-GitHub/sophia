@@ -16,12 +16,12 @@ use windows::Win32::{
   UI::WindowsAndMessaging::{
     EnumChildWindows, FindWindowW, GetClassNameW, GetClientRect, GetDesktopWindow,
     GetForegroundWindow, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW,
-    GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA,
+    GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, SendMessageA, SendMessageW,
     SetForegroundWindow, SetWindowPos, ShowWindow, ShowWindowAsync, GWL_EXSTYLE, GWL_STYLE,
-    SB_LINEDOWN, SB_LINEUP, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL,
-    WM_CLOSE, WM_KEYDOWN, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE,
-    WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_VSCROLL, WM_XBUTTONDOWN, WM_XBUTTONUP,
-    WS_CHILD, WS_EX_TOOLWINDOW,
+    SB_LINEDOWN, SB_LINEUP, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SW_HIDE, SW_SHOWNORMAL, WM_CHAR,
+    WM_CLOSE, WM_KEYDOWN, WM_KEYUP, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP,
+    WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_VSCROLL, WM_XBUTTONDOWN,
+    WM_XBUTTONUP, WS_CHILD, WS_EX_TOOLWINDOW,
   },
 };
 // SWP_NOMOVE, SWP_NOSIZE, SW_MAXIMIZE, SW_MINIMIZE,
@@ -784,7 +784,7 @@ pub fn mouse_wheel_scroll_in_window_inner(hwnd: HWND, coords: Point, is_up: bool
   //   );
   // }
 
-  //  SendMessageA(hWnd, WM_MOUSEWHEEL, MAKEWPARAM(x, MK_MBUTTON), MAKELPARAM(lastCoords.x, lastCoords.y));
+  // SendMessageA(hWnd, WM_MOUSEWHEEL, MAKEWPARAM(x, MK_MBUTTON), MAKELPARAM(lastCoords.x, lastCoords.y));
   // SendMessageA(hWnd, WM_MOUSEWHEEL, MAKEWPARAM(0, x*120), MAKELPARAM(lastCoords.x, lastCoords.y))
   ()
 }
@@ -820,3 +820,77 @@ pub fn mouse_wheel_scroll_in_window_inner(hwnd: HWND, coords: Point, is_up: bool
 // Virtual.window
 
 // Virtual.keyboard
+
+// [SendMessage in cpp and lparam intro](https://blog.csdn.net/yizhe0731/article/details/103194401)
+// [find window and send keyboard key to it in cpp demo](https://www.cnblogs.com/lidabo/p/16922309.html)
+// PostMessageA(hWnd, isKeyDown ? WM_KEYDOWN : WM_KEYUP, key, 0 | (key << 16) | (0 << 24) | (0 << 29) | ((UINT)!isKeyDown << 30) | ((UINT)!isKeyDown << 31));
+
+// [key toggler in cpp in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/virtual.cpp#L47)
+// [char print in cpp in keysender](https://github.com/Krombik/keysender/blob/d7eab7bc3bd287f2a756a87910130dd0e60b35e8/src/addon/virtual.cpp#L49-L54)
+
+// [keysender's keyboard in cpp](https://github.com/Krombik/keysender/blob/master/src/addon/keyboard.cpp)
+// Keyboard::toggleKey need keyToggler,getKeyboardKeyCode
+// Keyboard::printChar need charPrinter,bufferToWstring
+
+// [keysender's keyboard include head in cpp](https://github.com/Krombik/keysender/blob/master/src/addon/keyboard.hpp)
+// use virtual::keyToggler as private method
+// use virtual::charPrinter as private method
+
+// def Keyboard::toggleKey as public method
+// def Keyboard::printChar as public method
+///in keysender using  PostMessageA , here using SendMessageA
+pub fn keyboard_toggle_key_in_window_inner(hwnd: HWND, key: usize, is_key_down: bool) -> () {
+  // WM_KEYDOWN = 256u32 in rust in window.
+  // WM_KEYUP = 257u32 in rust in window.
+  // (UINT)!isKeyDown << 30 ? // bool-reverse -> bool to uinit -> int bit move
+  let lparam = 0
+    | (key << 16)
+    | (0 << 24)
+    | (0 << 29)
+    | ((!is_key_down as usize) << 30)
+    | ((!is_key_down as usize) << 31);
+
+  unsafe {
+    let _res = SendMessageA(
+      hwnd,
+      if is_key_down { WM_KEYDOWN } else { WM_KEYDOWN },
+      WPARAM(key),
+      LPARAM(lparam as isize),
+    );
+  }
+  ()
+}
+// [keyboard button types in ts in keysender](https://github.com/Krombik/keysender/blob/master/src/types/index.ts)
+
+///in keysender using  SendMessageW , here using SendMessageW
+pub fn keyboard_print_char_in_window_inner(hwnd: HWND, text: String) -> () {
+  //   // WM_CHAR = 258u32 in rust in window.
+
+  // [about std::wstring and std::stringin cpp]()
+  //
+  unsafe {
+    // str from u8 to u16
+    // let text = text.encode_utf16().collect::<Vec<_>>();
+    let text_u16 = encode_wide(text);
+    // print!("text in rust in inner: {}", decode_wide(&text_u16));
+    for c in text_u16 {
+      let _res = SendMessageW(hwnd, WM_CHAR, WPARAM(c as usize), LPARAM(0));
+    }
+    // [about the different of SendMessageW and SendMessageA](https://blog.csdn.net/notzuonotdied/article/details/70788937)
+    // use SendMessageW to fix unead-able code for non-english char.
+  }
+  ()
+}
+
+pub fn bytes_from_u8_to_u16(bytes: Vec<u8>) -> Vec<u16> {
+  // let slice: &[i32] = &[1, 2, 3, 4, 5];
+  let mut res = Vec::new();
+  let mut index = 0;
+  while index < bytes.len() {
+    // println!("Number: {}", slice[index]);
+    res.push(bytes[index] as u16 | (bytes[index + 1] as u16) << 8);
+    index += 2;
+  }
+  // wstr.push_back(wchar_t(buffer.Get(i).As<Napi::Number>().Int32Value() | (buffer.Get(i + 1).As<Napi::Number>().Int32Value() << 8)));
+  res
+}

@@ -1,12 +1,15 @@
+use std::io::Read;
+
 use crate::geometry::{Point, Rect, WindowMetaInfo, WindowView};
 use crate::screen::ImageData;
 use crate::utils::handle_result;
 use crate::win::utils::{
-  close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
-  get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next, get_hwnd_view,
-  get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd, kill_hwnd,
-  list_hwnd, mouse_move_in_window_inner, mouse_toggle_in_window_inner,
-  mouse_wheel_scroll_in_window_inner, set_active_hwnd, set_hwnd_pos, show_hwnd,
+  bytes_from_u8_to_u16, close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring,
+  get_hwnd_class_name, get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next,
+  get_hwnd_view, get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd,
+  keyboard_print_char_in_window_inner, kill_hwnd, list_hwnd, mouse_move_in_window_inner,
+  mouse_toggle_in_window_inner, mouse_wheel_scroll_in_window_inner, set_active_hwnd, set_hwnd_pos,
+  show_hwnd,
 };
 
 use napi::bindgen_prelude::*;
@@ -690,6 +693,33 @@ impl Window {
 
     let task = tokio::spawn(async move {
       mouse_wheel_scroll_in_window_inner(hwnd, coords, is_up);
+
+      Ok(()) //return void in js
+    });
+
+    handle_result(task).await
+  }
+  #[napi]
+  pub async fn typing(&self, text: String) -> Result<()> {
+    let hwnd = self.hwnd;
+
+    let task = tokio::spawn(async move {
+      // let mut vec_u16 = Vec::new();
+      // let mut index = 0;
+      // while index < text.len() {
+      //   // println!("Number: {}", slice[index]);
+      //   vec_u16.push((text[index] as i32 | (text[index + 1] as i32) << 8) as u16);
+      //   index += 2;
+      // }
+
+      // let buf = [u16; len];
+      // let buf = encode_wide(text);
+
+      // let text = text.encode_utf16().collect::<Vec<_>>();
+      // print!("info text in rust: {}", text);
+      // encode_wide
+      // keyboard_print_char_in_window_inner(hwnd, vec_u16);
+      keyboard_print_char_in_window_inner(hwnd, text);
 
       Ok(()) //return void in js
     });

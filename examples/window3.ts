@@ -1,6 +1,6 @@
 import { Window, getAllWindows, saveImageData, getScreenSize, takeScreenshot, Mouse } from '../index'
 import type { ImageData, Rect } from '../index'
-
+import { Buffer } from 'buffer'
 // constants
 /*
  * 2 - 3 - 4
@@ -147,6 +147,53 @@ function scrollMouseWheeInScrollRect(window: Window | null) {
   }, 1000)
 }
 
+function typingInInputRect(window: Window | null, text: string | Buffer) {
+  setInterval(async () => {
+    log(`[zero] typing text in input rect:`)
+    if (window) {
+      let { width, height } = await window.getWindowView()
+      let coords = {
+        x: Math.round(width / 2),
+        y: Math.round(height / 2),
+      }
+      coords = {
+        x: 602,
+        y: 97,
+      }
+      // move -> click ->  typing : done
+      await window.mouseMove(coords, false)
+      // press left
+      await window.mouseToggle(coords, 'left', false)
+      await sleep(50)
+      // release left
+      await window.mouseToggle(coords, 'left', true)
+      await sleep(50)
+      // ucs2
+      let buffer = typeof text == 'string' ? Buffer.from(text, 'utf8') : text
+      // log(buffer.toString('ucs2'))
+      log(buffer.toString('utf8'))
+      // await window.typing(buffer)
+      await window.typing(buffer.toString('utf8'))
+    }
+  }, 1000)
+}
+
+/**
+ * string to unit8 array buffer
+ * @sample
+ * ```
+ *
+ * ```
+ */
+function strToBuf(str: string) {
+  let array = new Uint8Array(new ArrayBuffer(str.length))
+  for (let i = 0, il = str.length; i < il; i++) {
+    let value = str.charCodeAt(i)
+    array[i] = value > 0xff ? 0x20 : value
+  }
+  let arrBuffer = array.buffer
+  return arrBuffer
+}
 async function main() {
   // let screenSize = await getScreenSize()
   log(`[zero] read all window:`)
@@ -327,10 +374,14 @@ async function main() {
     // }
 
     if (winx) {
-      // infoMousePosition(winx)
+      infoMousePosition(winx)
       // moveMousePositionRand(winx)
       // moveMousePositionInMenuRect(winx)
-      scrollMouseWheeInScrollRect(winx)
+      // scrollMouseWheeInScrollRect(winx)
+      // typingInInputRect(winx, 'hello world!') //done
+      // @ts-ignore
+      // typingInInputRect(winx, Buffer.from('zero 你好!', 'ucs2')) //fail
+      typingInInputRect(winx, Buffer.from('zero 你好!', 'utf8')) //fail
     }
   }
 }
