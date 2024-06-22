@@ -11,13 +11,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
   GetCursorPos, GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN,
 };
 
-// feat(core): mouse button enum
-// feat(core): mouse move
-// feat(core): mouse press with button type
-// feat(core): mouse release with button type
-// feat(core): mouse click with button type
-// feat(core): mouse get position
-
+// feat(core): define enum MouseButton for mouse button
 // todo(core): mouse scroll wheel Krombik/keysender's mouse
 // https://github.com/Krombik/keysender/blob/master/src/addon/mouse.cpp
 
@@ -32,6 +26,7 @@ pub enum MouseButton {
   Middle,
 }
 
+// feat(core): def struct Mouse for hardware or active window
 // code(core): def struct Mouse
 // code(core): use napi macro to label it
 
@@ -43,6 +38,8 @@ pub struct Mouse {}
 
 #[napi]
 impl Mouse {
+  // feat(core): add fn move to Mouse to  move mouse as static method
+
   // code(core): impl struct Mouse with a method mouse_move
   // code(core): use napi macro to label it and use move as js-name
   // code(core): use fn tokio::spawn to make async task
@@ -57,6 +54,9 @@ impl Mouse {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn press to Mouse to  press mouse as static method
+
   // code(core): impl struct Mouse with a method press
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -82,6 +82,9 @@ impl Mouse {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn release to Mouse to  release mouse as static method
+
   // code(core): impl struct Mouse with a method release
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -103,6 +106,9 @@ impl Mouse {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn click to Mouse to  click mouse as static method
+
   // code(core): impl struct Mouse with a method click
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -127,6 +133,9 @@ impl Mouse {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn get_position to Mouse to  get_position mouse as static method
+
   // code(core): impl struct Mouse with a method get_position
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task

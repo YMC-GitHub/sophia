@@ -1,24 +1,123 @@
-- feat(core): window minimize/maximize
-- feat(core): window get title
-- feat(core): window get class name
-- feat(core): window get window rect
-- feat(core): window set_position
-- feat(core): window set_size
-- feat(core): window is_foreground
-- feat(core): window set_foreground
-- feat(core): window is_open
-- feat(core): window is_minimized
-- feat(core): window is_visible
-- feat(core): window show
-- feat(core): get_foreground_window
-- feat(core): find_window_by_title
-- feat(core): window get_id
-- feat(core): from_name
-- feat(core): from_contains_name
-- feat(core): find_window_by_class_name
-- feat(core): window capture
-- feat(core): get_windows
-- feat(core): get_window_by_name
-- feat(core): from_contains_name
-- feat(core): get_foreground_window
-- feat(core): find_window_by_class_name
+- feat(core): define struct Window
+- feat(core): define fn list_window to list all window that is valid
+- feat(core): define fn get_foreground_window to get foreground window
+- feat(core): define fn find_window_by_pid to find window by process id
+- feat(core): define fn find_window_by_title to find window by window title
+- feat(core): define fn find_window_by_class_name to find window by window class name
+- feat(core): define fn find_window_contains_title to find window that contains title substring
+- feat(core): define fn find_window_contains_class_name to find window that contains class name substring
+- feat(core): add fn get_all_windows to Window as static method
+- feat(core): add fn get_foreground_window to Window as static method
+- feat(core): add fn find_window_by_pid to Window as static method
+- feat(core): add fn find_window_by_title to Window as static method
+- feat(core): add fn find_window_by_class_name to Window as static method
+- feat(core): add fn find_window_by_sub_title to Window as static method
+- feat(core): add fn find_window_by_sub_class_name to Window as static method
+- feat(core): add fn from_active to Window as instance method
+- feat(core): add fn from_title to Window as instance method
+- feat(core): add fn from_class_name to Window as instance method
+- feat(core): add fn from_pid to Window as instance method
+- feat(core): add fn from_sub_title to Window as instance method
+- feat(core): add fn from_sub_class_name to Window as instance method
+- feat(core): add fn as_raw_hwnd to Window as instance method to get hwnd id
+- feat(core): add fn get_id to Window as instance method to get window id
+- feat(core): add fn get_title to Window as instance method to get window title
+- feat(core): add fn get_class_name to Window as instance method to get window class name
+- feat(core): add fn get_window_rect to Window as instance method to get window rect
+- feat(core): add fn get_window_view to Window as instance method to get window view
+- feat(core): add fn get_window_meta_info to Window as instance method to get window meta info
+- feat(core): add fn get_mouse_pos to Window as instance method to get mouse position in window
+- feat(core): add fn set_position to Window as instance method to set window postion
+- feat(core): add fn set_size to Window as instance method to set window size
+- feat(core): add fn is_foreground to Window as instance method to check if window is foreground
+- feat(core): add fn foreground to Window as instance method to set window to foreground (here is active)
+- feat(core): add fn set_foreground to Window as instance method to set window to foreground (here is active)
+- feat(core): add fn is_open to Window as instance method to check if window is opened (isWindow in cpp)
+- feat(core): add fn is_minimized to Window as instance method to check if window is minimized (isIconic in cpp)
+- feat(core): add fn show to Window as instance method to show window
+- feat(core): add fn hide to Window as instance method to hide window
+- feat(core): add fn minimize to Window as instance method to minimize window
+- feat(core): add fn maximize to Window as instance method to maximize window
+- feat(core): add fn close to Window as instance method to close window
+- feat(core): add fn kill to Window as instance method to kill window
+- feat(core): add fn is_visible to Window as instance method to check if window visible (IsWindowVisible in cpp)
+- feat(core): add fn mouse_move to Window as instance method to move mouse in window
+- feat(core): add fn mouse_toggle to Window as instance method to toggle mouse button in window
+- feat(core): add fn mouse_wheel_scroll to Window as instance method to scroll mouse wheel in window
+- feat(core): add fn typing to Window as instance method to typing text with keyboard in window
+- feat(core): add fn keyboard_toggle_key to Window as instance method to toggle keys with keyboard in window
+- feat(core): add fn decode_lparam_value to Window as instance method to decode lparam
+- feat(core): add fn decode_lparam_value to Window as instance method to encode lparam
+- feat(core): add fn capture to Window as instance method to capture window
+- feat(core): add fn capture_area to Window as instance method to capture window rect
+- feat(core): define enum modifiers for keyboard
+- feat(core): define enum key for keyboard
+- feat(core): define struct Keyboard for hardware or active-window
+- feat(core): add static method press to press key
+- feat(core): add static method release to release key
+- feat(core): add static method click to click key
+- feat(core): add static method typing to typing text
+- feat(core): add static method register_hotkey to register hotkey
+- feat(core): add static method unregister_hotkey to unregister hotkey
+- feat(core): define enum MouseButton for mouse button
+- feat(core): def struct Mouse for hardware or active window
+- feat(core): add fn move to Mouse to  move mouse as static method
+- feat(core): add fn press to Mouse to  press mouse as static method
+- feat(core): add fn release to Mouse to  release mouse as static method
+- feat(core): add fn click to Mouse to  click mouse as static method
+- feat(core): add fn get_position to Mouse to  get_position mouse as static method
+- feat(core): def fn get_screen_size for screen
+- feat(core): def fn take_screenshot for screen
+- feat(core): define struct Process for memory
+- feat(core): define enum ProcessAccess for memory
+- feat(core): define struct OpenedProcess for memory
+- feat(core): add fn read_memory_bool to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_bool to OpenedProcess as instance method
+- feat(core): add fn read_memory_uint8 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_uint8 to OpenedProcess as instance method
+- feat(core): add fn read_memory_int8 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_int8 to OpenedProcess as instance method
+- feat(core): add fn read_memory_uint16 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_uint16 to OpenedProcess as instance method
+- feat(core): add fn read_memory_int16 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_int16 to OpenedProcess as instance method
+- feat(core): add fn read_memory_uint32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_uint32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_int32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_int32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_uint64 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_uint64 to OpenedProcess as instance method
+- feat(core): add fn read_memory_int64 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_int64 to OpenedProcess as instance method
+- feat(core): add fn read_memory_usize to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_usize to OpenedProcess as instance method
+- feat(core): add fn read_memory_float32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_float32 to OpenedProcess as instance method
+- feat(core): add fn read_memory_float64 to OpenedProcess as instance method
+- feat(core): add fn read_memory_chain_float64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_bool to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_bool to OpenedProcess as instance method
+- feat(core): add fn write_memory_uint8 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_uint8 to OpenedProcess as instance method
+- feat(core): add fn write_memory_int8 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_int8 to OpenedProcess as instance method
+- feat(core): add fn write_memory_uint16 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_uint16 to OpenedProcess as instance method
+- feat(core): add fn write_memory_int16 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_int16 to OpenedProcess as instance method
+- feat(core): add fn write_memory_uint32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_uint32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_int32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_int32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_uint64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_uint64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_int64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_int64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_usize to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_usize to OpenedProcess as instance method
+- feat(core): add fn write_memory_float32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_float32 to OpenedProcess as instance method
+- feat(core): add fn write_memory_float64 to OpenedProcess as instance method
+- feat(core): add fn write_memory_chain_float64 to OpenedProcess as instance method
+- feat(core): define fn open_process to open process with access and id
+- feat(core): define fn get_processes to get all process

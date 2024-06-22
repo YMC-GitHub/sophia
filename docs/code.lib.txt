@@ -5,3 +5,4 @@
 - code(core): use ./fib.rs as pub mod fib
 - code(core): use ./win/xx.rs as pub mod win
 - code(core): use macros cfg(target_os = "windows") to label it
+- code(core): use common/xx as pub mod common

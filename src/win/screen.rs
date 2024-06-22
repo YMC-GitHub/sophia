@@ -41,6 +41,8 @@ fn create_bitmap_info(width: i32, height: i32) -> BITMAPINFO {
   }
 }
 
+// feat(core): def fn get_screen_size for screen
+
 // code(core): def fn get_screen_size
 // code(core): use napi macro to label it
 
@@ -64,6 +66,8 @@ pub async fn get_screen_size() -> Result<Point> {
 
   handle_result(task).await
 }
+
+// feat(core): def fn take_screenshot for screen
 
 // code(core): def fn take_screenshot
 // code(core): use napi macro to label it

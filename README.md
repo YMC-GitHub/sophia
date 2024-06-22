@@ -12,8 +12,8 @@
 
 ## Features adding
 
-- to send combine keys to not active window
-- capture not active window
+- to send combine keys to non-active window
+- capture non-active window
 
 get more info in [CHANELOG.md](./CHANELOG.md)
 
@@ -123,7 +123,7 @@ async function main() {
 
     // await window.typing('hello 你好')
 
-    // sending combine keys to not active window
+    // sending combine keys to non-active window
     // method 01: work
     // await Keyboard.press(Key.Control)
     // await window.keyboardToggleKey(['V'], true, false)
@@ -206,6 +206,4 @@ Sophia is licensed under the MIT License. Feel free to use it in your projects, 
 ## Todo
 
 - ~~init impl in an init fn like [dimusic/active-win-pos-rs 's init_platform_api](https://github.com/dimusic/active-win-pos-rs/blob/main/src/win/mod.rs)~~
-
-- ~~send combine keys to not active window~~
-- ~~capture not active window~~
+- share keyboard keys in global and virtual window

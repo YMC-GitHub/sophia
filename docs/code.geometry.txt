@@ -6,3 +6,7 @@
 - code(core): use napi(object) macro to label struct Rect
 - code(core): use derive(Debug, Clone) macro to label struct Rect
 - code(core): impl struct Rect with a method new
+- code(core): def struct WindowView
+- code(core): use napi(object) macro to label it
+- code(core): use derive(Debug, Clone) macro to label it
+- code(core): impl struct WindowView with a method new

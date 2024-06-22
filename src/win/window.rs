@@ -74,36 +74,15 @@ async fn show_hwnd_async(hwnd: HWND, state: SHOW_WINDOW_CMD) -> Result<()> {
 }
 
 // set module method
-// feat(core): get_windows
-// feat(core): get_window_by_name
-// feat(core): from_contains_name
-// feat(core): get_foreground_window
-// feat(core): find_window_by_class_name
+// ...
 
 // set class static method
-// feat(core): get_foreground_window
-// feat(core): find_window_by_title
-// feat(core): window get_id
-// feat(core): from_name
-// feat(core): from_contains_name
-// feat(core): find_window_by_class_name
-// feat(core): window capture
-// feat(core): window capture rect
+// ...
 
 // set class public method
-// feat(core): window minimize/maximize
-// feat(core): window get title
-// feat(core): window get class name
-// feat(core): window get window rect
-// feat(core): window set_position
-// feat(core): window set_size
-// feat(core): window is_foreground
-// feat(core): window set_foreground
-// feat(core): window is_open
-// feat(core): window is_minimized
-// feat(core): window is_visible
-// feat(core): window show
+// ...
 
+// feat(core): define struct Window
 // code(core): def struct Window
 // code(core): use napi macro to label it
 // code(core): with hwnd prop
@@ -169,6 +148,8 @@ pub fn find_window_contains_class_name_inner(name: String) -> Window {
   Window { hwnd: window.hwnd }
 }
 
+// feat(core): define fn list_window to list all window that is valid
+
 // todo: make alias get_all_windows
 // todo: list_window_sync,list_window_async
 #[napi]
@@ -182,6 +163,8 @@ pub async fn list_window() -> Result<Vec<Window>> {
 pub async fn get_all_windows() -> Result<Vec<Window>> {
   list_window().await
 }
+
+// feat(core): define fn get_foreground_window to get foreground window
 
 // code(core): def pub fn get_foreground_window
 // code(core): use napi macro to label it
@@ -201,6 +184,8 @@ pub async fn get_foreground_window() -> Result<Option<Window>> {
   });
   handle_result(task).await
 }
+
+// feat(core): define fn find_window_by_pid to find window by process id
 
 /// create a Window instance with pid
 #[napi]
@@ -224,6 +209,8 @@ pub async fn find_window_by_pid(pid: u32) -> Result<Option<Window>> {
   // let task = tokio::spawn(async move { Ok(Some(find_window_by_pid_inner(pid))) });
   // handle_result(task).await
 }
+
+// feat(core): define fn find_window_by_title to find window by window title
 
 /// create a Window instance with title
 ///
@@ -254,6 +241,8 @@ pub async fn find_window_by_title(title: String) -> Result<Option<Window>> {
   handle_result(task).await
 }
 
+// feat(core): define fn find_window_by_class_name to find window by window class name
+
 ///
 #[napi]
 pub async fn find_window_by_class_name(classname: String) -> Result<Option<Window>> {
@@ -272,6 +261,8 @@ pub async fn find_window_by_class_name(classname: String) -> Result<Option<Windo
   });
   handle_result(task).await
 }
+
+// feat(core): define fn find_window_contains_title to find window that contains title substring
 
 /// create a Window instance with title substring
 ///
@@ -296,7 +287,9 @@ pub async fn find_window_contains_title(title: String) -> Result<Option<Window>>
   // handle_result(task).await
 }
 
-/// create a Window instance with title substring
+// feat(core): define fn find_window_contains_class_name to find window that contains class name substring
+
+/// create a Window instance with class name substring
 ///
 /// NOTE
 ///
@@ -324,14 +317,23 @@ pub async fn find_window_contains_class_name(name: String) -> Result<Option<Wind
 impl Window {
   // bind as static method in js
   // ------------static-----------
+
+  // feat(core): add fn get_all_windows to Window as static method
+
   #[napi]
   pub async fn get_all_windows() -> Result<Vec<Window>> {
     list_window().await
   }
+
+  // feat(core): add fn get_foreground_window to Window as static method
+
   #[napi]
   pub async fn get_foreground_window() -> Result<Option<Window>> {
     get_foreground_window().await
   }
+
+  // feat(core): add fn find_window_by_pid to Window as static method
+
   #[napi]
   pub async fn find_window_by_pid(pid: u32) -> Result<Option<Window>> {
     // todo: fix err when not this pid ?
@@ -340,10 +342,14 @@ impl Window {
     find_window_by_pid(pid).await
   }
 
+  // feat(core): add fn find_window_by_title to Window as static method
+
   #[napi]
   pub async fn find_window_by_title(title: String) -> Result<Option<Window>> {
     find_window_by_title(title).await
   }
+
+  // feat(core): add fn find_window_by_class_name to Window as static method
 
   #[napi]
   pub async fn find_window_by_class_name(classname: String) -> Result<Option<Window>> {
@@ -351,10 +357,14 @@ impl Window {
     // from_sub_class_name(title).await
   }
 
+  // feat(core): add fn find_window_by_sub_title to Window as static method
+
   #[napi]
   pub async fn find_window_by_sub_title(title: String) -> Result<Option<Window>> {
     find_window_contains_title(title).await
   }
+
+  // feat(core): add fn find_window_by_sub_class_name to Window as static method
 
   #[napi]
   pub async fn find_window_by_sub_class_name(title: String) -> Result<Option<Window>> {
@@ -362,19 +372,29 @@ impl Window {
   }
 
   // set method binding as public in js
+
+  // feat(core): add fn from_active to Window as instance method
+
   #[napi]
   pub async fn from_active(&self) -> Result<Option<Window>> {
     get_foreground_window().await
   }
+
+  // feat(core): add fn from_title to Window as instance method
+
   #[napi]
   pub async fn from_title(&self, title: String) -> Result<Option<Window>> {
     find_window_by_title(title).await
   }
 
+  // feat(core): add fn from_class_name to Window as instance method
+
   #[napi]
   pub async fn from_class_name(&self, name: String) -> Result<Option<Window>> {
     find_window_by_class_name(name).await
   }
+
+  // feat(core): add fn from_pid to Window as instance method
 
   #[napi]
   pub async fn from_pid(&self, pid: u32) -> Result<Option<Window>> {
@@ -384,10 +404,14 @@ impl Window {
     find_window_by_pid(pid).await
   }
 
+  // feat(core): add fn from_sub_title to Window as instance method
+
   #[napi]
   pub async fn from_sub_title(&self, title: String) -> Result<Option<Window>> {
     find_window_contains_title(title).await
   }
+
+  // feat(core): add fn from_sub_class_name to Window as instance method
 
   #[napi]
   pub async fn from_sub_class_name(&self, name: String) -> Result<Option<Window>> {
@@ -405,10 +429,15 @@ impl Window {
       hwnd: HWND(hwnd as isize),
     }
   }
+
+  // feat(core): add fn as_raw_hwnd to Window as instance method to get hwnd id
+
   #[napi]
   pub fn as_raw_hwnd(&self) -> isize {
     self.hwnd.0
   }
+
+  // feat(core): add fn get_id to Window as instance method to get window id
 
   // get id,title,classname,
   #[napi]
@@ -417,6 +446,8 @@ impl Window {
     let task = tokio::spawn(async move { Ok(get_hwnd_pid(hwnd)) });
     handle_result(task).await
   }
+
+  // feat(core): add fn get_title to Window as instance method to get window title
 
   // code(core): impl struct Window with a method get_title
   // code(core): use napi macro to label it
@@ -433,6 +464,8 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn get_class_name to Window as instance method to get window class name
+
   // code(core): impl struct Window with a method get_class_name
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -446,6 +479,8 @@ impl Window {
     let task = tokio::spawn(async move { Ok(get_hwnd_class_name(hwnd)) });
     handle_result(task).await
   }
+
+  // feat(core): add fn get_window_rect to Window as instance method to get window rect
 
   // get rect,mouse-pos,
   // code(core): impl struct Window with a method get_window_rect
@@ -465,6 +500,8 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn get_window_view to Window as instance method to get window view
+
   /// like keysender's workwindow.getWindowView
   ///
   #[napi]
@@ -473,6 +510,8 @@ impl Window {
     let task = tokio::spawn(async move { Ok(get_hwnd_view(hwnd)) });
     handle_result(task).await
   }
+
+  // feat(core): add fn get_window_meta_info to Window as instance method to get window meta info
 
   //
   #[napi]
@@ -484,12 +523,16 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn get_mouse_pos to Window as instance method to get mouse position in window
+
   #[napi]
   pub async fn get_mouse_pos(&self) -> Result<Point> {
     let hwnd = self.hwnd;
     let task = tokio::spawn(async move { Ok(get_mouse_position_in_window(hwnd)) });
     handle_result(task).await
   }
+
+  // feat(core): add fn set_position to Window as instance method to set window postion
 
   // code(core): impl struct Window with a method set_position
   // code(core): use napi macro to label it
@@ -502,6 +545,8 @@ impl Window {
     set_hwnd_pos_async(self.hwnd, x, y, 0, 0, SWP_NOSIZE).await
   }
 
+  // feat(core): add fn set_size to Window as instance method to set window size
+
   // code(core): impl struct Window with a method set_size
   // code(core): use napi macro to label it
   // code(core): use const windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE
@@ -512,6 +557,8 @@ impl Window {
     // self.set_window_pos(0, 0, width, height, SWP_NOMOVE).await
     set_hwnd_pos_async(self.hwnd, 0, 0, width, height, SWP_NOMOVE).await
   }
+
+  // feat(core): add fn is_foreground to Window as instance method to check if window is foreground
 
   // code(core): impl struct Window with a method is_foreground
   // code(core): use napi macro to label it
@@ -529,6 +576,8 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn foreground to Window as instance method to set window to foreground (here is active)
+
   // code(core): impl struct Window with a method foreground
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -542,6 +591,8 @@ impl Window {
     set_active_hwnd_async(self.hwnd).await
   }
 
+  // feat(core): add fn set_foreground to Window as instance method to set window to foreground (here is active)
+
   // code(core): impl struct Window with a method set_foreground
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -552,6 +603,9 @@ impl Window {
     // self.set_active_window().await
     set_active_hwnd_async(self.hwnd).await
   }
+
+  // feat(core): add fn is_open to Window as instance method to check if window is opened (isWindow in cpp)
+
   /// like keysender's workwindow.isOpen
   ///
   #[napi]
@@ -561,6 +615,9 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn is_minimized to Window as instance method to check if window is minimized (isIconic in cpp)
+
   #[napi]
   pub async fn is_minimized(&self) -> Result<bool> {
     let hwnd = self.hwnd;
@@ -568,6 +625,9 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn show to Window as instance method to show window
+
   // code(core): impl struct Window with a method show
   // code(core): use napi macro to label it
   // code(core): use fn tokio::spawn to make async task
@@ -584,11 +644,16 @@ impl Window {
     // handle_result(task).await
     show_hwnd_async(self.hwnd, SW_SHOWNOACTIVATE).await
   }
+
+  // feat(core): add fn hide to Window as instance method to hide window
+
   #[napi]
   pub async fn hide(&self) -> Result<()> {
     // self.show_window(SW_MINIMIZE).await
     show_hwnd_async(self.hwnd, SW_HIDE).await
   }
+
+  // feat(core): add fn minimize to Window as instance method to minimize window
 
   // code(core): impl struct Window with a method minimize
   // code(core): use napi macro to label it
@@ -600,6 +665,8 @@ impl Window {
     show_hwnd_async(self.hwnd, SW_MINIMIZE).await
   }
 
+  // feat(core): add fn maximize to Window as instance method to maximize window
+
   // code(core): impl struct Window with a method maximize
   // code(core): use napi macro to label it
   // code(core): use inner fn self.show_window
@@ -609,6 +676,8 @@ impl Window {
     // self.show_window(SW_MAXIMIZE).await
     show_hwnd_async(self.hwnd, SW_MAXIMIZE).await
   }
+
+  // feat(core): add fn close to Window as instance method to close window
 
   #[napi]
   pub async fn close(&self) -> Result<()> {
@@ -627,6 +696,8 @@ impl Window {
   //   show_hwnd_async(self.hwnd, SW_SHOWDEFAULT).await
   // }
 
+  // feat(core): add fn kill to Window as instance method to kill window
+
   #[napi]
   pub async fn kill(&self) -> Result<()> {
     let hwnd = self.hwnd;
@@ -637,6 +708,8 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn is_visible to Window as instance method to check if window visible (IsWindowVisible in cpp)
 
   #[napi]
   pub async fn is_visible(&self) -> Result<bool> {
@@ -650,7 +723,9 @@ impl Window {
 
     handle_result(task).await
   }
-  //
+
+  // feat(core): add fn mouse_move to Window as instance method to move mouse in window
+
   #[napi]
   pub async fn mouse_move(&self, coords: Point, is_absolute: bool) -> Result<()> {
     let hwnd = self.hwnd;
@@ -670,7 +745,9 @@ impl Window {
 
     handle_result(task).await
   }
-  // mouse_toggler_in_window_inner
+
+  // feat(core): add fn mouse_toggle to Window as instance method to toggle mouse button in window
+
   #[napi]
   pub async fn mouse_toggle(
     &self,
@@ -689,6 +766,8 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn mouse_wheel_scroll to Window as instance method to scroll mouse wheel in window
+
   #[napi]
   pub async fn mouse_wheel_scroll(&self, coords: Point, is_up: bool) -> Result<()> {
     let hwnd = self.hwnd;
@@ -701,6 +780,9 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn typing to Window as instance method to typing text with keyboard in window
+
   #[napi]
   pub async fn typing(&self, text: String) -> Result<()> {
     let hwnd = self.hwnd;
@@ -711,6 +793,8 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn keyboard_toggle_key to Window as instance method to toggle keys with keyboard in window
 
   // toggleKey
   #[napi]
@@ -733,6 +817,8 @@ impl Window {
     handle_result(task).await
   }
 
+  // feat(core): add fn decode_lparam_value to Window as instance method to decode lparam
+
   #[napi]
   pub async fn decode_lparam_value(value: u32) -> Result<LParamFlag> {
     // let hwnd = self.hwnd;
@@ -743,6 +829,9 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn decode_lparam_value to Window as instance method to encode lparam
+
   #[napi]
   pub async fn cook_lparam_value(vk: u32, flag: LParamFlag) -> Result<i32> {
     // let hwnd = self.hwnd;
@@ -756,9 +845,9 @@ impl Window {
 
     handle_result(task).await
   }
-  // vk_from_u16
 
-  // parse_l_param
+  // feat(core): add fn capture to Window as instance method to capture window
+
   // code(core): def fn capture
   // code(core): use napi macro to label it
 
@@ -786,6 +875,8 @@ impl Window {
 
     handle_result(task).await
   }
+
+  // feat(core): add fn capture_area to Window as instance method to capture window rect
 
   #[napi]
   pub async fn capture_area(&self, x: i32, y: i32, width: i32, height: i32) -> Result<ImageData> {

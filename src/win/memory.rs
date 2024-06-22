@@ -19,12 +19,16 @@ use windows::Win32::System::Threading::{
   PROCESS_WRITE_OWNER,
 };
 
+// feat(core): define struct Process for memory
+
 #[napi(object)]
 #[derive(Debug)]
 pub struct Process {
   pub pid: u32,
   pub name: String,
 }
+
+// feat(core): define enum ProcessAccess for memory
 
 #[napi]
 pub enum ProcessAccess {
@@ -74,6 +78,9 @@ impl From<ProcessAccess> for PROCESS_ACCESS_RIGHTS {
     }
   }
 }
+
+// feat(core): define struct OpenedProcess for memory
+
 #[napi]
 #[derive(Debug)]
 pub struct OpenedProcess {
@@ -255,11 +262,15 @@ where
 
 #[napi]
 impl OpenedProcess {
+  // feat(core): add fn read_memory_bool to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_bool(&self, address: BigInt) -> Result<bool> {
     let address = bigint_to_u64(address);
     read_memory::<bool>(self.handle, address).await
   }
+
+  // feat(core): add fn read_memory_chain_bool to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_bool(
@@ -272,6 +283,8 @@ impl OpenedProcess {
     read_memory_chain::<bool>(self.handle, base_address, offsets).await
   }
 
+  // feat(core): add fn read_memory_uint8 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_uint8(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -281,6 +294,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_uint8 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_uint8(
@@ -297,6 +312,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_int8 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_int8(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -306,6 +323,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_int8 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_int8(
@@ -322,6 +341,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_uint16 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_uint16(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -331,6 +352,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_uint16 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_uint16(
@@ -347,6 +370,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_int16 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_int16(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -356,6 +381,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_int16 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_int16(
@@ -372,6 +399,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_uint32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_uint32(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -381,6 +410,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_uint32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_uint32(
@@ -397,6 +428,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_int32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_int32(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -406,6 +439,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_int32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_int32(
@@ -422,6 +457,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_uint64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_uint64(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -431,6 +468,8 @@ impl OpenedProcess {
       words: vec![result],
     })
   }
+
+  // feat(core): add fn read_memory_chain_uint64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_uint64(
@@ -447,6 +486,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_int64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_int64(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -456,6 +497,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_int64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_int64(
@@ -472,6 +515,8 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_usize to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_usize(&self, address: BigInt) -> Result<BigInt> {
     let address = bigint_to_u64(address);
@@ -481,6 +526,8 @@ impl OpenedProcess {
       words: vec![result as u64],
     })
   }
+
+  // feat(core): add fn read_memory_chain_usize to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_usize(
@@ -497,11 +544,15 @@ impl OpenedProcess {
     })
   }
 
+  // feat(core): add fn read_memory_float32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_float32(&self, address: BigInt) -> Result<f32> {
     let address = bigint_to_u64(address);
     read_memory::<f32>(self.handle, address).await
   }
+
+  // feat(core): add fn read_memory_chain_float32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_float32(
@@ -514,11 +565,15 @@ impl OpenedProcess {
     read_memory_chain::<f32>(self.handle, base_address, offsets).await
   }
 
+  // feat(core): add fn read_memory_float64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn read_memory_float64(&self, address: BigInt) -> Result<f64> {
     let address = bigint_to_u64(address);
     read_memory::<f64>(self.handle, address).await
   }
+
+  // feat(core): add fn read_memory_chain_float64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn read_memory_chain_float64(
@@ -531,11 +586,15 @@ impl OpenedProcess {
     read_memory_chain::<f64>(self.handle, base_address, offsets).await
   }
 
+  // feat(core): add fn write_memory_bool to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_bool(&self, address: BigInt, value: bool) -> Result<()> {
     let address = bigint_to_u64(address);
     write_memory::<bool>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_bool to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_bool(
@@ -549,12 +608,16 @@ impl OpenedProcess {
     write_memory_chain::<bool>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_uint8 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_uint8(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_u8(value);
     write_memory::<u8>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_uint8 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_uint8(
@@ -569,12 +632,16 @@ impl OpenedProcess {
     write_memory_chain::<u8>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_int8 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_int8(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_i8(value);
     write_memory::<i8>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_int8 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_int8(
@@ -589,12 +656,16 @@ impl OpenedProcess {
     write_memory_chain::<i8>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_uint16 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_uint16(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_u16(value);
     write_memory::<u16>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_uint16 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_uint16(
@@ -609,12 +680,16 @@ impl OpenedProcess {
     write_memory_chain::<u16>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_int16 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_int16(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_i16(value);
     write_memory::<i16>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_int16 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_int16(
@@ -629,12 +704,16 @@ impl OpenedProcess {
     write_memory_chain::<i16>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_uint32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_uint32(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_u32(value);
     write_memory::<u32>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_uint32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_uint32(
@@ -649,12 +728,16 @@ impl OpenedProcess {
     write_memory_chain::<u32>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_int32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_int32(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_i32(value);
     write_memory::<i32>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_int32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_int32(
@@ -669,12 +752,16 @@ impl OpenedProcess {
     write_memory_chain::<i32>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_uint64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_uint64(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_u64(value);
     write_memory::<u64>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_uint64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_uint64(
@@ -689,12 +776,16 @@ impl OpenedProcess {
     write_memory_chain::<u64>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_int64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_int64(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_i64(value);
     write_memory::<i64>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_int64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_int64(
@@ -709,12 +800,16 @@ impl OpenedProcess {
     write_memory_chain::<i64>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_usize to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_usize(&self, address: BigInt, value: BigInt) -> Result<()> {
     let address = bigint_to_u64(address);
     let value = bigint_to_usize(value);
     write_memory::<usize>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_usize to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_usize(
@@ -729,11 +824,15 @@ impl OpenedProcess {
     write_memory_chain::<usize>(self.handle, base_address, offsets, value).await
   }
 
+  // feat(core): add fn write_memory_float32 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_float32(&self, address: BigInt, value: f64) -> Result<()> {
     let address = bigint_to_u64(address);
     write_memory::<f32>(self.handle, address, value as f32).await
   }
+
+  // feat(core): add fn write_memory_chain_float32 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_float32(
@@ -747,11 +846,15 @@ impl OpenedProcess {
     write_memory_chain::<f32>(self.handle, base_address, offsets, value as f32).await
   }
 
+  // feat(core): add fn write_memory_float64 to OpenedProcess as instance method
+
   #[napi]
   pub async fn write_memory_float64(&self, address: BigInt, value: f64) -> Result<()> {
     let address = bigint_to_u64(address);
     write_memory::<f64>(self.handle, address, value).await
   }
+
+  // feat(core): add fn write_memory_chain_float64 to OpenedProcess as instance method
 
   #[napi]
   pub async fn write_memory_chain_float64(
@@ -773,6 +876,8 @@ impl Drop for OpenedProcess {
     }
   }
 }
+
+// feat(core): define fn open_process to open process with access and id
 
 #[napi]
 pub async fn open_process(access: ProcessAccess, pid: u32) -> Result<OpenedProcess> {
@@ -799,6 +904,8 @@ pub async fn open_process(access: ProcessAccess, pid: u32) -> Result<OpenedProce
 
   handle_result(task).await
 }
+
+// feat(core): define fn get_processes to get all process
 
 #[napi]
 pub async fn get_processes() -> Result<Vec<Process>> {

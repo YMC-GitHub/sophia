@@ -21,6 +21,9 @@ use windows::Win32::UI::WindowsAndMessaging::{
   WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT, WS_OVERLAPPED,
 };
 
+// feat(core): define enum modifiers for keyboard
+// feat(core): define enum key for keyboard
+
 #[napi]
 #[derive(Debug, PartialEq)]
 pub enum Modifiers {
@@ -481,6 +484,14 @@ pub fn keyboard_typing_keys_global(text: String) -> () {
 
   ()
 }
+
+// feat(core): define struct Keyboard for hardware or active-window
+// feat(core): add static method press to press key
+// feat(core): add static method release to release key
+// feat(core): add static method click to click key
+// feat(core): add static method typing to typing text
+// feat(core): add static method register_hotkey to register hotkey
+// feat(core): add static method unregister_hotkey to unregister hotkey
 
 #[napi]
 pub struct Keyboard {}
