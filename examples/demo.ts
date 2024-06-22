@@ -1,46 +1,8 @@
-<div align="center">
-  <h1>Sophia</h1>
-  <p>
-    <strong>🤖 A Node.js library for automating Windows applications.</strong>
-  </p>
-  
-  [![NPM Version](https://img.shields.io/npm/v/@yors/sophia)](https://www.npmjs.com/package/@yors/sophia)
-  ![NPM License](https://img.shields.io/npm/l/@yors/sophia)
-</div>
+// import {Window} from "@yors/sophia";
+// import type {ImageData} from "@yors/sophia";
 
-## forked from @deeean/sophia
-
-## Features adding
-
-- to send combine keys to not active window
-- capture not active window
-
-get more info in [CHANELOG.md](./CHANELOG.md)
-
-## Features based
-
-- Keyboard
-- Mouse
-- Screen
-- Window
-- Memory
-
-get more info in [@deeean/sophia](https://www.npmjs.com/package/@deeean/sophia)
-
-## Installation
-
-```bash
-npm install @yors/sophia
-```
-
-## Example
-
-```ts
-import { Window } from '@yors/sophia'
-import type { ImageData } from '@yors/sophia'
-
-// import { Window, saveImageData } from '../'
-// import type { ImageData } from '../'
+import { Window, saveImageData } from '../'
+import type { ImageData } from '../'
 
 const { log } = console
 main()
@@ -172,40 +134,3 @@ async function getWindowState(window: Window) {
     foreground,
   }
 }
-```
-
-## Supported Platforms
-
-Only support Windows x64 for now.
-
-## Inspiration
-
-I'm a big fan of [AutoHotkey](https://www.autohotkey.com/), but I want to use it in Node.js. So I decided to create a library that can automate Windows applications.
-
-## Related projects
-
-- [AutoHotkey](https://github.com/AutoHotkey/AutoHotkey)
-- [PyAutoGUI](https://github.com/asweigart/pyautogui)
-- [RobotJS](https://github.com/octalmage/robotjs)
-- [Krombik/keysender](https://github.com/Krombik/keysender)
-- [deeean/sophia](https://github.com/deeean/sophia)
-
-## Thanks
-
-- [miniben-90/x-win](https://github.com/miniben-90/x-win)
-- [rubickCenter/rubick-native](https://github.com/rubickCenter/rubick-native)
-- [nashaofu/node-screenshots](https://github.com/nashaofu/node-screenshots)
-- [LaunchMenu/node-global-key-listener](https://github.com/LaunchMenu/node-global-key-listener)
-
-- [dimusic/active-win-pos-rs](https://github.com/dimusic/active-win-pos-rs)
-
-## License
-
-Sophia is licensed under the MIT License. Feel free to use it in your projects, adhering to the license terms.
-
-## Todo
-
-- ~~init impl in an init fn like [dimusic/active-win-pos-rs 's init_platform_api](https://github.com/dimusic/active-win-pos-rs/blob/main/src/win/mod.rs)~~
-
-- ~~send combine keys to not active window~~
-- ~~capture not active window~~

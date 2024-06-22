@@ -415,23 +415,82 @@ unsafe extern "system" fn global_hotkey_proc(
   DefWindowProcW(hwnd, msg, wparam, lparam)
 }
 
+pub fn keyboard_press_key_global(key: u16) -> () {
+  unsafe {
+    let mut input = INPUT::default();
+    input.r#type = INPUT_KEYBOARD;
+    input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
+    input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE);
+    input.Anonymous.ki.time = 0;
+    SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+  }
+  ()
+}
+
+pub fn keyboard_release_key_global(key: u16) -> () {
+  unsafe {
+    let mut input = INPUT::default();
+    input.r#type = INPUT_KEYBOARD;
+    input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
+    input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE | KEYEVENTF_KEYUP);
+    input.Anonymous.ki.time = 0;
+    SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+  }
+  ()
+}
+
+pub fn keyboard_click_key_global(key: u16) -> () {
+  unsafe {
+    let mut inputs = Vec::new();
+
+    let mut input = INPUT::default();
+    input.r#type = INPUT_KEYBOARD;
+    input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
+    input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE);
+    input.Anonymous.ki.time = 0;
+    inputs.push(input);
+
+    input.Anonymous.ki.dwFlags |= KEYEVENTF_KEYUP;
+    inputs.push(input);
+
+    SendInput(inputs.as_slice(), std::mem::size_of::<INPUT>() as i32);
+  }
+  ()
+}
+
+pub fn keyboard_typing_keys_global(text: String) -> () {
+  unsafe {
+    let text = text.encode_utf16().collect::<Vec<_>>();
+
+    let mut inputs = Vec::new();
+
+    for c in text {
+      let mut input = INPUT::default();
+      input.r#type = INPUT_KEYBOARD;
+      input.Anonymous.ki.dwFlags = KEYEVENTF_UNICODE;
+      input.Anonymous.ki.wScan = c;
+      input.Anonymous.ki.time = 0;
+      inputs.push(input);
+
+      input.Anonymous.ki.dwFlags |= KEYEVENTF_KEYUP;
+      inputs.push(input);
+    }
+
+    SendInput(inputs.as_slice(), std::mem::size_of::<INPUT>() as i32);
+  }
+
+  ()
+}
+
 #[napi]
 pub struct Keyboard {}
 
 #[napi]
 impl Keyboard {
   #[napi]
-  pub async fn press(key: Key) -> Result<()> {
+  pub async fn press(key: u16) -> Result<()> {
     let task = tokio::spawn(async move {
-      unsafe {
-        let mut input = INPUT::default();
-        input.r#type = INPUT_KEYBOARD;
-        input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
-        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE);
-        input.Anonymous.ki.time = 0;
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-      }
-
+      let _ = keyboard_press_key_global(key);
       Ok(())
     });
 
@@ -439,17 +498,9 @@ impl Keyboard {
   }
 
   #[napi]
-  pub async fn release(key: Key) -> Result<()> {
+  pub async fn release(key: u16) -> Result<()> {
     let task = tokio::spawn(async move {
-      unsafe {
-        let mut input = INPUT::default();
-        input.r#type = INPUT_KEYBOARD;
-        input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
-        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE | KEYEVENTF_KEYUP);
-        input.Anonymous.ki.time = 0;
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-      }
-
+      let _ = keyboard_release_key_global(key);
       Ok(())
     });
 
@@ -457,24 +508,9 @@ impl Keyboard {
   }
 
   #[napi]
-  pub async fn click(key: Key) -> Result<()> {
+  pub async fn click(key: u16) -> Result<()> {
     let task = tokio::spawn(async move {
-      unsafe {
-        let mut inputs = Vec::new();
-
-        let mut input = INPUT::default();
-        input.r#type = INPUT_KEYBOARD;
-        input.Anonymous.ki.wVk = VIRTUAL_KEY(key as u16);
-        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS::from(KEYEVENTF_UNICODE);
-        input.Anonymous.ki.time = 0;
-        inputs.push(input);
-
-        input.Anonymous.ki.dwFlags |= KEYEVENTF_KEYUP;
-        inputs.push(input);
-
-        SendInput(inputs.as_slice(), std::mem::size_of::<INPUT>() as i32);
-      }
-
+      let _ = keyboard_click_key_global(key);
       Ok(())
     });
 
@@ -484,26 +520,7 @@ impl Keyboard {
   #[napi]
   pub async fn typing(text: String) -> Result<()> {
     let task = tokio::spawn(async move {
-      unsafe {
-        let text = text.encode_utf16().collect::<Vec<_>>();
-
-        let mut inputs = Vec::new();
-
-        for c in text {
-          let mut input = INPUT::default();
-          input.r#type = INPUT_KEYBOARD;
-          input.Anonymous.ki.dwFlags = KEYEVENTF_UNICODE;
-          input.Anonymous.ki.wScan = c;
-          input.Anonymous.ki.time = 0;
-          inputs.push(input);
-
-          input.Anonymous.ki.dwFlags |= KEYEVENTF_KEYUP;
-          inputs.push(input);
-        }
-
-        SendInput(inputs.as_slice(), std::mem::size_of::<INPUT>() as i32);
-      }
-
+      let _ = keyboard_typing_keys_global(text);
       Ok(())
     });
 

@@ -114,3 +114,16 @@ pub struct WindowMetaInfo {
 //     Self::new(-1 as i32, "".to_string(), "".to_string(), "".to_string())
 //   }
 // }
+
+#[napi(object)]
+#[derive(Debug, Clone)]
+pub struct LParamFlag {
+  pub scan_code: u32,
+  pub repeat_count: u32,
+  pub transition_state: bool,
+  pub is_extended: bool,
+  pub previous_key_state: bool,
+  pub context_code: bool,
+}
+
+// lparam_from_isize(lparam_isize_from_flag(key, 1, false, false, false))

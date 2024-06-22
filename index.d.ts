@@ -28,6 +28,14 @@ export interface WindowMetaInfo {
   className: string
   rect: Rect
 }
+export interface LParamFlag {
+  scanCode: number
+  repeatCount: number
+  transitionState: boolean
+  isExtended: boolean
+  previousKeyState: boolean
+  contextCode: boolean
+}
 export interface Color {
   r: number
   g: number
@@ -240,9 +248,9 @@ export class ImageData {
   pixelWidth: number
 }
 export class Keyboard {
-  static press(key: Key): Promise<void>
-  static release(key: Key): Promise<void>
-  static click(key: Key): Promise<void>
+  static press(key: number): Promise<void>
+  static release(key: number): Promise<void>
+  static click(key: number): Promise<void>
   static typing(text: string): Promise<void>
   static registerHotkey(mods: Array<Modifiers>, key: Key, callback: (...args: any[]) => any): number
   static unregisterHotkey(id: number): void
@@ -305,6 +313,7 @@ export class Mouse {
   static getPosition(): Promise<Point>
 }
 export class Window {
+  static getAllWindows(): Promise<Array<Window>>
   static getForegroundWindow(): Promise<Window | null>
   static findWindowByPid(pid: number): Promise<Window | null>
   static findWindowByTitle(title: string): Promise<Window | null>
@@ -359,6 +368,9 @@ export class Window {
   mouseToggle(coords: Point, button: string, isButtonDown: boolean): Promise<void>
   mouseWheelScroll(coords: Point, isUp: boolean): Promise<void>
   typing(text: string): Promise<void>
+  keyboardToggleKey(keys: Array<string>, isKeyDown: boolean, isPrevKeyDown: boolean): Promise<void>
+  static decodeLparamValue(value: number): Promise<LParamFlag>
+  static cookLparamValue(vk: number, flag: LParamFlag): Promise<number>
   capture(): Promise<ImageData>
   captureArea(x: number, y: number, width: number, height: number): Promise<ImageData>
 }

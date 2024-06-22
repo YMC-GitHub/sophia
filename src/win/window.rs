@@ -1,15 +1,14 @@
-use std::io::Read;
-
-use crate::geometry::{Point, Rect, WindowMetaInfo, WindowView};
+use crate::geometry::{LParamFlag, Point, Rect, WindowMetaInfo, WindowView};
 use crate::screen::ImageData;
 use crate::utils::handle_result;
 use crate::win::utils::{
-  bytes_from_u8_to_u16, close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring,
-  get_hwnd_class_name, get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next,
-  get_hwnd_view, get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd,
-  keyboard_print_char_in_window_inner, kill_hwnd, list_hwnd, mouse_move_in_window_inner,
+  close_hwnd, coords_move, get_hwnd_by_class_name, get_hwnd_by_title_hstring, get_hwnd_class_name,
+  get_hwnd_meta_info, get_hwnd_pid, get_hwnd_rect, get_hwnd_title_next, get_hwnd_view,
+  get_mouse_position_in_window, is_foreground_hwnd, is_minimize_hwnd, is_open_hwnd,
+  keyboard_print_char_in_window_inner, keyboard_send_combine_key_in_window_inner, kill_hwnd,
+  list_hwnd, lparam_u32_from_flag, lparam_u32_to_flag, mouse_move_in_window_inner,
   mouse_toggle_in_window_inner, mouse_wheel_scroll_in_window_inner, set_active_hwnd, set_hwnd_pos,
-  show_hwnd,
+  show_hwnd, vk_from_u16,
 };
 
 use napi::bindgen_prelude::*;
@@ -53,7 +52,6 @@ async fn set_hwnd_pos_async(
 
   let task = tokio::spawn(async move {
     set_hwnd_pos(hwnd, x, y, width, height, flags);
-
     Ok(())
   });
 
@@ -326,6 +324,10 @@ pub async fn find_window_contains_class_name(name: String) -> Result<Option<Wind
 impl Window {
   // bind as static method in js
   // ------------static-----------
+  #[napi]
+  pub async fn get_all_windows() -> Result<Vec<Window>> {
+    list_window().await
+  }
   #[napi]
   pub async fn get_foreground_window() -> Result<Option<Window>> {
     get_foreground_window().await
@@ -702,31 +704,61 @@ impl Window {
   #[napi]
   pub async fn typing(&self, text: String) -> Result<()> {
     let hwnd = self.hwnd;
-
     let task = tokio::spawn(async move {
-      // let mut vec_u16 = Vec::new();
-      // let mut index = 0;
-      // while index < text.len() {
-      //   // println!("Number: {}", slice[index]);
-      //   vec_u16.push((text[index] as i32 | (text[index + 1] as i32) << 8) as u16);
-      //   index += 2;
-      // }
-
-      // let buf = [u16; len];
-      // let buf = encode_wide(text);
-
-      // let text = text.encode_utf16().collect::<Vec<_>>();
-      // print!("info text in rust: {}", text);
-      // encode_wide
-      // keyboard_print_char_in_window_inner(hwnd, vec_u16);
       keyboard_print_char_in_window_inner(hwnd, text);
-
       Ok(()) //return void in js
     });
 
     handle_result(task).await
   }
 
+  // toggleKey
+  #[napi]
+  pub async fn keyboard_toggle_key(
+    &self,
+    keys: Vec<String>,
+    is_key_down: bool,
+    is_prev_key_down: bool,
+  ) -> Result<()> {
+    let hwnd = self.hwnd;
+    let task = tokio::spawn(async move {
+      // keyboard_toggle_key_in_window_inner(hwnd, text, is_key_down);
+      for key in keys {
+        // keyboard_toggle_key_in_window_inner(hwnd, key, is_key_down, is_prev_key_down);
+        keyboard_send_combine_key_in_window_inner(hwnd, key, is_key_down, is_prev_key_down);
+      }
+      Ok(()) //return void in js
+    });
+
+    handle_result(task).await
+  }
+
+  #[napi]
+  pub async fn decode_lparam_value(value: u32) -> Result<LParamFlag> {
+    // let hwnd = self.hwnd;
+    let task = tokio::spawn(async move {
+      let res = lparam_u32_to_flag(value as u32);
+      Ok(res) //return void in js
+    });
+
+    handle_result(task).await
+  }
+  #[napi]
+  pub async fn cook_lparam_value(vk: u32, flag: LParamFlag) -> Result<i32> {
+    // let hwnd = self.hwnd;
+    let task = tokio::spawn(async move {
+      //  flag
+      // let res = lparam_isize_from_flag(vk_from_u16(key as u16), lparam_flag_preset_keyup());
+      let res = lparam_u32_from_flag(vk_from_u16(vk as u16), flag) as i32;
+
+      Ok(res) //return void in js
+    });
+
+    handle_result(task).await
+  }
+  // vk_from_u16
+
+  // parse_l_param
   // code(core): def fn capture
   // code(core): use napi macro to label it
 
