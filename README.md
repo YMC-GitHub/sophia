@@ -207,3 +207,7 @@ Sophia is licensed under the MIT License. Feel free to use it in your projects, 
 
 - ~~init impl in an init fn like [dimusic/active-win-pos-rs 's init_platform_api](https://github.com/dimusic/active-win-pos-rs/blob/main/src/win/mod.rs)~~
 - share keyboard keys in global and virtual window
+
+- [x] sophia-util,sophia-core
+- [x] sophia-wasm
+- [ ] sophia-node

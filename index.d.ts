@@ -234,7 +234,7 @@ export function findWindowByClassName(classname: string): Promise<Window | null>
  */
 export function findWindowContainsTitle(title: string): Promise<Window | null>
 /**
- * create a Window instance with title substring
+ * create a Window instance with class name substring
  *
  * NOTE
  *
