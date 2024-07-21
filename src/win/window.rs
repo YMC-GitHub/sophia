@@ -886,8 +886,15 @@ impl Window {
 
     let task = tokio::spawn(async move {
       // let hwnd = GetDesktopWindow();
+
+      // BitBlt dramatically faster, often fails
+      // (e.g. firefox, steam, 3d accelerated windows)
+      // 0
+      let using = win_screenshot::capture::Using::BitBlt;
+
+      // 1
       // PrintWindow much slower, much more reliable
-      let using = win_screenshot::capture::Using::PrintWindow;
+      // let using = win_screenshot::capture::Using::PrintWindow;
 
       // Capture client area of window
       let area = win_screenshot::capture::Area::ClientOnly;
@@ -915,4 +922,47 @@ impl Window {
 
     handle_result(task).await
   }
+  // feat(core): add fn capture_area to Window as instance method to capture window rect
+
+  // #[napi]
+  // pub async fn capture_area_fast(&self, x: i32, y: i32, width: i32, height: i32) -> Result<ImageData> {
+  //   let hwnd = self.hwnd;
+
+  //   // let rect = get_window_rect_sync(hwnd);
+
+  //   let task = tokio::spawn(async move {
+  //     // let hwnd = GetDesktopWindow();
+  //     // BitBlt dramatically faster, often fails
+  //     // (e.g. firefox, steam, 3d accelerated windows)
+  //     let using = win_screenshot::capture::Using::BitBlt;
+
+  //     // PrintWindow much slower, much more reliable
+  //     // let using = win_screenshot::capture::Using::PrintWindow;
+
+  //     // Capture client area of window
+  //     let area = win_screenshot::capture::Area::ClientOnly;
+  //     // Capture whole window (not supported with BitBlt)
+  //     // let area = Area::Full;
+
+  //     // Build-in crop, faster on large windows
+  //     // let crop_xy = None; //Some([100, 100]);
+  //     // let crop_wh = None; //Some([300, 300]);
+  //     let crop_xy = Some([x, y]);
+  //     let crop_wh = Some([width, height]);
+
+  //     let buf =
+  //       win_screenshot::capture::capture_window_ex(hwnd.0, using, area, crop_xy, crop_wh).unwrap();
+  //     let w: u32 = buf.width;
+  //     let h: u32 = buf.height;
+
+  //     Ok(ImageData {
+  //       data: buf.pixels,
+  //       width: buf.width,
+  //       height: buf.height,
+  //       pixel_width: (4 * w * h) as u8,
+  //     })
+  //   });
+
+  //   handle_result(task).await
+  // }
 }
