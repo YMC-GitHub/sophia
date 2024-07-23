@@ -1,8 +1,11 @@
-import { Window, saveImageData, takeScreenshot } from '../index'
-import type { ImageData, Rect, Point, WindowView } from '../index'
+import { Window, saveImageData, takeScreenshot, getScreenSize, readImageData, imageSearch } from '../'
+import type { ImageData, Rect, Point, WindowView } from '../'
 import { chaintask } from './nano-fune'
 
 import { objfSortByKey } from './nano-flag'
+import { isAllowIndex } from './nano-stre'
+import { makedirs } from './nanz-core'
+import { formatDate } from './nano-time'
 
 // feat(core): sleep - let current func statck sleep miliseconds to wait
 export function sleep(ms: number) {
@@ -78,12 +81,6 @@ export async function getWindowListInfo() {
   }
 }
 
-export interface FindWindowProp {
-  title?: string
-  className?: string
-  id?: string
-  sort?: string
-}
 export interface WindowBaseInfo {
   title: string
   className: string
@@ -105,6 +102,27 @@ export interface WindowRuntimeInfo {
   width: number
   height: number
   window: Window
+}
+export interface FindWindowProp {
+  title?: string
+  className?: string
+  id?: string
+  sort?: string
+}
+export interface CaptureImageProp {
+  desFile?: string
+  desInfo?: boolean
+  windows?: WindowList
+  view?: WindowView
+  takeScreen?: boolean
+  foreGround?: boolean
+  allowIndex?: string
+}
+export interface SearchImageCrop {
+  src?: string
+  srcLarge?: string
+  screen?: string
+  variant?: number
 }
 
 // feat(core): findWindowList - get window list through title,class name
@@ -212,17 +230,8 @@ export function readWindowListFromRWL(list: WindowRuntimeInfo[]) {
  * await captureWindowList({desFile:`runtime/window/{index}/main.png`})
  * ```
  */
-export async function captureWindowList(
-  opts: FindWindowProp & {
-    desFile?: string
-    desInfo?: boolean
-    windows?: WindowList
-    view?: WindowView
-    takeScreen?: boolean
-    foreGround?: boolean
-  },
-) {
-  let { desFile, desInfo, windows, view, takeScreen, foreGround } = opts
+export async function captureWindowList(opts: FindWindowProp & CaptureImageProp) {
+  let { desFile, desInfo, windows, view, takeScreen, foreGround, allowIndex } = opts
 
   // findWindowList + readRuntimeWindowList
   let list = await readRuntimeWindowList(windows ? windows : await findWindowList(opts))
@@ -233,66 +242,44 @@ export async function captureWindowList(
   let task = list.map((item, i) => {
     return async () => {
       let index = i + 1
-      log(`[zero] capture window: ${index}`)
+      if (allowIndex && !isAllowIndex(index, allowIndex)) {
+        return null
+      }
+
+      // log(`[zero] capture window: ${index}`);
 
       let { window } = item
       let imgdata: ImageData
-
-      // let winstate = await getWindowState(window);
-      // log(`[zero] window state: `, jsonstro(winstate));
-
-      // if (winstate.minimize) {
-      //   //ensure window is not minimize! but not active!
-      //   // log(`[zero] window set forground when window is isMinimized`)
-      //   // let setfored = await window.setForeground()
-      //   // log(`[zero] set foreground status`, setfored)
-      //   // log(`[zero] window show when window is isMinimized`);
-      //   let showed = await window.show();
-      //   // log(`[zero] set showed status`, showed);
-      //   // show ? show + fouground
-
-      //   // log(`[zero] please wait for showing`);
-      //   await sleep(100); // wait for show
-      //   // Promise.race()
-      // }
-
-      // imgdata = await window.capture();
-
       let { x, y, width, height } = view ? view : await window.getWindowView()
-      log(`[zero] window view: `, jsonstro({ x, y, width, height }))
-      let rect = await window.getWindowRect()
-      log(`[zero] window rect: `, jsonstro(rect))
-
-      // view = { x: 1, y: 26, width: 1024, height: 768 };
-      // ({ x, y, width, height } = view);
-      // imgdata = await window.capture();
-
-      // imgdata = await window.captureArea(x, y, width, height);
-      // imgdata = await window.captureArea(0, 0, width, height);
-
-      imgdata = await window.captureArea(0, 0, 1030, 797)
-      // imgdata = await window.captureArea(0, 0, 1030, 797);
-
+      // get width and height in window when not pass view
+      if (!view) {
+        x = 0
+        y = 0
+      }
+      imgdata = await window.captureArea(x, y, width, height)
       // save when pass --des-file xx
       if (des) {
         let loc: string = des.replace(/{index}/gi, `${index}`) // render --des-file exp to txt
         if (desInfo) log(`[zero] ${loc}:`)
+        makedirs(loc)
         await saveImageData(loc, imgdata)
         // await sleep(1000);
       }
 
       if (takeScreen) {
+        // --take-screen --foreground --des xx
         let screendata = await takeScreenshot(x, y, width, height)
         if (foreGround && !(await window.isForeground())) {
           await window.foreground()
           await window.show()
           await sleep(2000)
-          let winstate = await getWindowState(window)
-          log(`[zero] window state: `, jsonstro(winstate))
+          // let winstate = await getWindowState(window);
+          // log(`[zero] window state: `, jsonstro(winstate));
         }
         if (des) {
           let loc: string = des.replace(/{index}/gi, `screen_${index}`) // render --des-file exp to txt
-          if (desInfo) log(`[zero] ${loc}:`)
+          // if (desInfo) log(`[zero] ${loc}:`);
+          makedirs(loc)
           await saveImageData(loc, screendata)
           // await sleep(1000);
         }
@@ -302,7 +289,7 @@ export async function captureWindowList(
     }
   })
   // return await Promise.all(task);
-  let result = await chaintask(task)
+  let result: (ImageData | null)[] = await chaintask(task)
   return result
 }
 
@@ -325,5 +312,151 @@ export async function getWindowState(window: Window, info: boolean = false) {
     visible,
     minimize,
     foreground,
+  }
+}
+
+export async function searchImage(opts: SearchImageCrop & FindWindowProp & CaptureImageProp) {
+  let { src, srcLarge, screen, title, allowIndex, desFile, variant } = opts
+  src = src ? src : ``
+  srcLarge = srcLarge ? srcLarge : ``
+  allowIndex = allowIndex ? `${allowIndex}` : ''
+  desFile = desFile ? `${desFile}` : ``
+  // runtime/window/{index}_main_search.png
+
+  // image,search,replace
+  const searchin = await Promise.all([src].filter((v) => v).map((loc) => readImageData(loc)))
+
+  // let screenshot : ImageData
+  let imagelist: (ImageData | null)[] = []
+
+  if (srcLarge) {
+    imagelist = await Promise.all([srcLarge].filter((v) => v).map((loc) => readImageData(loc)))
+  } else {
+    if (screen) {
+      // capture screen when --screen
+      const screenSize = await getScreenSize()
+      const screenshot = await takeScreenshot(0, 0, screenSize.x, screenSize.y)
+      imagelist.push(screenshot)
+    } else {
+      let { windows, info } = await findWindowList({ title })
+
+      let runtimeWindows = readRuntimeWindowList({ windows, info })
+      ;({ windows, info } = readWindowListFromRWL(runtimeWindows))
+      let view = await windows[0].getWindowView()
+      // const { log } = console;
+      // log(jsonstro(view));
+      let takeScreen = screen ? screen : false
+      let now = new Date()
+      let strn = formatDate('yyyy_MM_dd_HH_mm_ss', now)
+      let saveFile: boolean = false
+      let enableInfoImage: boolean = false
+
+      let images = await captureWindowList({
+        title: title,
+        // id: String(wininfo.id),
+        view: { ...view, x: 0, y: 0 },
+        desFile: saveFile ? desFile.replace(/{now}/gi, strn) : '',
+        takeScreen: takeScreen as boolean,
+        foreGround: false,
+        allowIndex: allowIndex,
+        // windows: windows,
+      })
+
+      // imagelist = images;
+      // pixelWidth=184!!
+      // {width:1030,height:797,pixelWidth:184}
+      // will occur err when pixelWidth large than 4
+
+      // load image from files when using save-file mode
+      // capture -> save -> load (not perf)
+      if (saveFile) {
+        let files = make_files_from_list(desFile, { now: `${strn}` }, images)
+        imagelist = await read_image_from_files_allow_null(files)
+        imagelist.map((i) => info_image(i, enableInfoImage))
+        // {width:1030,height:797,pixelWidth:4}
+      } else {
+        images.forEach((i) => edit_image_pixel_width_when_lg_pixel_width(i, 4))
+        images.forEach((i) => info_image(i, enableInfoImage))
+        imagelist = images
+      }
+
+      // load images from files
+    }
+  }
+
+  let [baboon] = searchin
+  let res_point = await find_image_allow_null(baboon, imagelist, false, variant)
+  let { width, height } = baboon
+  let res_rect = res_point.map((v) => {
+    if (v) {
+      let center = {
+        cx: v.x + Math.floor(width / 2),
+        cy: v.y + Math.floor(height / 2),
+      }
+      return { ...v, width, height, ...center }
+    }
+    return null
+  })
+  return res_rect
+
+  function info_image(img: ImageData | null, enableInfoImage: boolean = false) {
+    if (enableInfoImage && img) {
+      let { width, height, pixelWidth } = img
+      console.log(jsonstro({ width, height, pixelWidth }))
+    }
+  }
+  function edit_image_pixel_width_when_lg_pixel_width(img: ImageData | null, pixelWidth: number = 4) {
+    if (img) {
+      if (img.pixelWidth > pixelWidth) img.pixelWidth = pixelWidth
+    }
+  }
+
+  function make_files_from_list(desFileTpl: string, data: Record<string, string>, images: any[]) {
+    return images.map((_, i) => {
+      let index = i + 1
+      if (allowIndex && !isAllowIndex(index, allowIndex)) {
+        return ''
+      }
+      data.index = `${index}`
+      let keys = Object.keys(data)
+      for (let k = 0; k < keys.length; k++) {
+        const key = keys[k]
+        let reg = new RegExp(`{${key}}`, 'ig')
+        desFileTpl = desFileTpl.replace(reg, data[key])
+      }
+      return desFileTpl
+    })
+  }
+
+  async function read_image_from_files_allow_null(files: (string | null)[]) {
+    return await Promise.all(files.map((loc) => (loc ? readImageData(loc) : null)))
+  }
+
+  async function find_image_allow_null(
+    baboon: ImageData,
+    imagelist: (ImageData | null)[],
+    info?: boolean,
+    variant: number = 0,
+  ) {
+    let task = imagelist.map((screenshot, i) => {
+      return async () => {
+        // [baboon, screenshot] = [screenshot, baboon];
+
+        if (screenshot) {
+          if (info) {
+            const { log } = console
+            log(`[zero] search in ${i + 1}`)
+          }
+
+          if (variant < 1 && variant > 0) {
+            variant = Math.floor(variant * 255)
+          }
+          return await imageSearch(screenshot, baboon, variant)
+        }
+        return null
+      }
+    })
+    // promise all task
+    return await Promise.all(task.map((fn) => fn()))
   }
 }

@@ -364,6 +364,10 @@ export class Window {
   close(): Promise<void>
   kill(): Promise<void>
   isVisible(): Promise<boolean>
+  /**
+   *
+   * not move coords to last coord in if is_absolute
+   */
   mouseMove(coords: Point, isAbsolute: boolean): Promise<void>
   mouseToggle(coords: Point, button: string, isButtonDown: boolean): Promise<void>
   mouseWheelScroll(coords: Point, isUp: boolean): Promise<void>
