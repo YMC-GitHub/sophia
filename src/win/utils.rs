@@ -1755,3 +1755,16 @@ pub fn bytes_from_u8_to_u16(bytes: Vec<u8>) -> Vec<u16> {
   }
   res
 }
+
+// pub fn last_coords() -> HashMap<String, u32> {
+//   let teams_list = vec![("x".to_string(), 0), ("y".to_string(), 0)];
+
+//   let teams_map: HashMap<_, _> = teams_list.into_iter().collect();
+//   teams_map
+// }
+// lazy_static! {
+//   pub static ref VIRTUAL_LAST_COORD: HashMap<String, u32> = {
+//     let coords = last_coords();
+//     coords
+//   };
+// }

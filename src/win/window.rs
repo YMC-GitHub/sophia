@@ -1,4 +1,5 @@
 use crate::geometry::{LParamFlag, Point, Rect, WindowMetaInfo, WindowView};
+// todo: move crate::screen::ImageData to crate::image::ImageData
 use crate::screen::ImageData;
 use crate::utils::handle_result;
 use crate::win::utils::{
@@ -22,10 +23,9 @@ use windows::Win32::UI::WindowsAndMessaging::{
   GetForegroundWindow, IsWindowVisible, SET_WINDOW_POS_FLAGS, SHOW_WINDOW_CMD, SWP_NOMOVE,
   SWP_NOSIZE, SW_HIDE, SW_MAXIMIZE, SW_MINIMIZE, SW_SHOWNOACTIVATE,
 };
+
 // [hide window with ShowWindow or SendMessage in cpp](https://blog.csdn.net/u012486325/article/details/71732362)
-
 // [is-minimized in cpp](https://itecnotes.com/tecnote/c-how-to-verify-if-a-window-of-another-program-is-minimized)
-
 // [about findwindowexa in cpp](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-findwindowexa)
 
 // use std::ptr;
@@ -91,10 +91,19 @@ async fn show_hwnd_async(hwnd: HWND, state: SHOW_WINDOW_CMD) -> Result<()> {
 #[napi]
 pub struct Window {
   hwnd: HWND,
-  // last_coords: Point,
+  last_coords: Point,
 }
 // code(core): impl Window
 // code(core): use napi macro to label it
+
+impl Window {
+  pub fn new(hwnd: HWND) -> Self {
+    Self {
+      hwnd,
+      last_coords: Point::new(0, 0),
+    }
+  }
+}
 
 // [as raw HWND of the window and hwnd id](https://github.com/NiiightmareXD/windows-capture/blob/main/src/window.rs#L223)
 // [from raw HWND of the window and hwnd id](https://github.com/NiiightmareXD/windows-capture/blob/main/src/window.rs#217)
@@ -104,10 +113,12 @@ pub struct Window {
 ///
 /// hwnd id vs pid, is the same ?
 pub fn get_window_from_hwnd_id(hwnd: isize) -> Window {
-  Window { hwnd: HWND(hwnd) }
+  // Window { hwnd: HWND(hwnd) }
+  Window::new(HWND(hwnd))
 }
 pub fn get_window_from_hwnd(hwnd: HWND) -> Window {
-  Window { hwnd }
+  // Window { hwnd }
+  Window::new(hwnd)
 }
 ///
 /// NOTE
@@ -127,7 +138,8 @@ pub fn find_window_by_pid_inner(pid: u32) -> Window {
     .iter()
     .find(|i| get_hwnd_pid(i.hwnd) == pid)
     .unwrap();
-  Window { hwnd: window.hwnd }
+  // Window { hwnd: window.hwnd }
+  Window::new(window.hwnd)
 }
 
 pub fn find_window_contains_title_inner(title: String) -> Window {
@@ -136,7 +148,8 @@ pub fn find_window_contains_title_inner(title: String) -> Window {
     .iter()
     .find(|i| get_hwnd_title_next(i.hwnd).contains(&title))
     .unwrap();
-  Window { hwnd: window.hwnd }
+  // Window { hwnd: window.hwnd }
+  Window::new(window.hwnd)
 }
 
 pub fn find_window_contains_class_name_inner(name: String) -> Window {
@@ -145,7 +158,8 @@ pub fn find_window_contains_class_name_inner(name: String) -> Window {
     .iter()
     .find(|i| get_hwnd_class_name(i.hwnd).contains(&name))
     .unwrap();
-  Window { hwnd: window.hwnd }
+  // Window { hwnd: window.hwnd }
+  Window::new(window.hwnd)
 }
 
 // feat(core): define fn list_window to list all window that is valid
@@ -179,7 +193,8 @@ pub async fn get_foreground_window() -> Result<Option<Window>> {
     if hwnd.0 == 0 {
       Ok(None)
     } else {
-      Ok(Some(Window { hwnd }))
+      // Ok(Some(Window { hwnd }))
+      Ok(Some(Window::new(hwnd)))
     }
   });
   handle_result(task).await
@@ -201,7 +216,8 @@ pub async fn find_window_by_pid(pid: u32) -> Result<Option<Window>> {
       if hwnd.0 == 0 {
         Ok(None)
       } else {
-        Ok(Some(Window { hwnd }))
+        // Ok(Some(Window { hwnd }))
+        Ok(Some(Window::new(hwnd)))
       }
     });
   handle_result(task).await
@@ -235,7 +251,8 @@ pub async fn find_window_by_title(title: String) -> Result<Option<Window>> {
     if hwnd.0 == 0 {
       Ok(None)
     } else {
-      Ok(Some(Window { hwnd }))
+      // Ok(Some(Window { hwnd }))
+      Ok(Some(Window::new(hwnd)))
     }
   });
   handle_result(task).await
@@ -256,7 +273,8 @@ pub async fn find_window_by_class_name(classname: String) -> Result<Option<Windo
     if hwnd.0 == 0 {
       Ok(None)
     } else {
-      Ok(Some(Window { hwnd }))
+      // Ok(Some(Window { hwnd }))
+      Ok(Some(Window::new(hwnd)))
     }
   });
   handle_result(task).await
@@ -278,7 +296,8 @@ pub async fn find_window_contains_title(title: String) -> Result<Option<Window>>
       if hwnd.0 == 0 {
         Ok(None)
       } else {
-        Ok(Some(Window { hwnd }))
+        // Ok(Some(Window { hwnd }))
+        Ok(Some(Window::new(hwnd)))
       }
     });
   handle_result(task).await
@@ -303,7 +322,8 @@ pub async fn find_window_contains_class_name(name: String) -> Result<Option<Wind
     if hwnd.0 == 0 {
       Ok(None)
     } else {
-      Ok(Some(Window { hwnd }))
+      // Ok(Some(Window { hwnd }))
+      Ok(Some(Window::new(hwnd)))
     }
   });
   handle_result(task).await
@@ -425,9 +445,10 @@ impl Window {
   //   }
   // }
   pub fn from_raw_hwnd(&self, hwnd: u32) -> Window {
-    Window {
-      hwnd: HWND(hwnd as isize),
-    }
+    // Window {
+    //   hwnd: HWND(hwnd as isize),
+    // }
+    Window::new(HWND(hwnd as isize))
   }
 
   // feat(core): add fn as_raw_hwnd to Window as instance method to get hwnd id
@@ -727,19 +748,21 @@ impl Window {
   // feat(core): add fn mouse_move to Window as instance method to move mouse in window
 
   #[napi]
+  ///
+  /// not move coords to last coord in if is_absolute
   pub async fn mouse_move(&self, coords: Point, is_absolute: bool) -> Result<()> {
     let hwnd = self.hwnd;
-
+    let mut last_coords = self.last_coords;
     let task = tokio::spawn(async move {
       if is_absolute {
-        let last_coords = get_mouse_position_in_window(hwnd);
-        mouse_move_in_window_inner(hwnd, coords_move(last_coords, coords));
+        mouse_move_in_window_inner(hwnd, coords);
+      } else {
+        // let last_coords = get_mouse_position_in_window(hwnd);
+        last_coords = coords_move(last_coords, coords);
+        mouse_move_in_window_inner(hwnd, last_coords);
         // need move mouse in screen ?
         // ...
-      } else {
-        mouse_move_in_window_inner(hwnd, coords);
       }
-
       Ok(()) //return void in js
     });
 
@@ -759,7 +782,6 @@ impl Window {
 
     let task = tokio::spawn(async move {
       mouse_toggle_in_window_inner(hwnd, coords, button, is_button_down);
-
       Ok(()) //return void in js
     });
 
@@ -862,15 +884,18 @@ impl Window {
       // let hwnd = GetDesktopWindow();
 
       let buf = win_screenshot::capture::capture_window(hwnd.0).unwrap();
-      let w: u32 = buf.width;
-      let h: u32 = buf.height;
+      // let w: u32 = buf.width;
+      // let h: u32 = buf.height;
+      // let pixel_width = (4 * w * h) as u8;
+      let pixel_width = (4) as u8;
 
       Ok(ImageData {
         data: buf.pixels,
         width: buf.width,
         height: buf.height,
-        pixel_width: (4 * w * h) as u8,
+        pixel_width: pixel_width,
       })
+      //
     });
 
     handle_result(task).await
@@ -909,60 +934,19 @@ impl Window {
 
       let buf =
         win_screenshot::capture::capture_window_ex(hwnd.0, using, area, crop_xy, crop_wh).unwrap();
-      let w: u32 = buf.width;
-      let h: u32 = buf.height;
+      // let w: u32 = buf.width;
+      // let h: u32 = buf.height;
+      // let pixel_width = (4 * w * h) as u8;
+      let pixel_width = (4) as u8;
 
       Ok(ImageData {
         data: buf.pixels,
         width: buf.width,
         height: buf.height,
-        pixel_width: (4 * w * h) as u8,
+        pixel_width: pixel_width,
       })
     });
 
     handle_result(task).await
   }
-  // feat(core): add fn capture_area to Window as instance method to capture window rect
-
-  // #[napi]
-  // pub async fn capture_area_fast(&self, x: i32, y: i32, width: i32, height: i32) -> Result<ImageData> {
-  //   let hwnd = self.hwnd;
-
-  //   // let rect = get_window_rect_sync(hwnd);
-
-  //   let task = tokio::spawn(async move {
-  //     // let hwnd = GetDesktopWindow();
-  //     // BitBlt dramatically faster, often fails
-  //     // (e.g. firefox, steam, 3d accelerated windows)
-  //     let using = win_screenshot::capture::Using::BitBlt;
-
-  //     // PrintWindow much slower, much more reliable
-  //     // let using = win_screenshot::capture::Using::PrintWindow;
-
-  //     // Capture client area of window
-  //     let area = win_screenshot::capture::Area::ClientOnly;
-  //     // Capture whole window (not supported with BitBlt)
-  //     // let area = Area::Full;
-
-  //     // Build-in crop, faster on large windows
-  //     // let crop_xy = None; //Some([100, 100]);
-  //     // let crop_wh = None; //Some([300, 300]);
-  //     let crop_xy = Some([x, y]);
-  //     let crop_wh = Some([width, height]);
-
-  //     let buf =
-  //       win_screenshot::capture::capture_window_ex(hwnd.0, using, area, crop_xy, crop_wh).unwrap();
-  //     let w: u32 = buf.width;
-  //     let h: u32 = buf.height;
-
-  //     Ok(ImageData {
-  //       data: buf.pixels,
-  //       width: buf.width,
-  //       height: buf.height,
-  //       pixel_width: (4 * w * h) as u8,
-  //     })
-  //   });
-
-  //   handle_result(task).await
-  // }
 }

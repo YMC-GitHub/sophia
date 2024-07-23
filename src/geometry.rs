@@ -6,7 +6,7 @@ use napi_derive::napi;
 // code(core): impl struct Point with a method new
 
 #[napi(object)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Point {
   pub x: i32,
   pub y: i32,
